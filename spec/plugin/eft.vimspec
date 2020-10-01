@@ -2,6 +2,10 @@ let s:expect = themis#helper('expect')
 
 Describe eft
 
+  After each
+    call eft#clear()
+  End
+
   Describe same as native behavior
     It should work as native f
       for l:motion in ['fh', "\<Plug>(eft-f)h"]
@@ -135,8 +139,22 @@ Describe eft
     End
   End
 
+  Describe repeat
+    It should repeat
+      enew!
+      call setline(1, ['aaa aaa aaa aaa'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f-repeatable)a", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
+      call feedkeys("\<Plug>(eft-f-repeatable)", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      call feedkeys("\<Plug>(eft-f-repeatable)", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 13])
+    End
+  End
+
   Describe ;
-    It should match ignorecase
+    It should repeat
       enew!
       call setline(1, ['aaa aaa aaa aaa'])
       call cursor([1, 1])

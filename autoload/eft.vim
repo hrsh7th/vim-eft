@@ -1,6 +1,16 @@
 let s:state = {}
 
 "
+" eft#clear
+"
+function! eft#clear() abort
+  augroup eft
+    autocmd!
+  augroup END
+  let s:state = {}
+endfunction
+
+"
 " eft#repeat
 "
 function! eft#repeat() abort
@@ -14,15 +24,23 @@ endfunction
 "
 " eft#forward
 "
-function! eft#forward(till) abort
-  call eft#goto('forward', a:till, '')
+function! eft#forward(till, repeat) abort
+  if a:repeat && !empty(s:state) && s:state.mode ==# 'forward'
+    call eft#goto('forward', a:till, s:state.char)
+  else
+    call eft#goto('forward', a:till, '')
+  endif
 endfunction
 
 "
 " eft#backward
 "
-function! eft#backward(till) abort
-  call eft#goto('backward', a:till, '')
+function! eft#backward(till, repeat) abort
+  if a:repeat && !empty(s:state) && s:state.mode ==# 'backward'
+    call eft#goto('backward', a:till, s:state.char)
+  else
+    call eft#goto('backward', a:till, '')
+  endif
 endfunction
 
 "
