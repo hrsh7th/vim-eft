@@ -39,13 +39,6 @@ VARIABLE                                                        *eft-variable*
 
 
 
->
-  let g:eft_repeatable = v:false
-<
-    Specify enable or disable repeatable feature.
-
-
-
 ==============================================================================
 MAPPING                                                          *eft-mapping*
 
