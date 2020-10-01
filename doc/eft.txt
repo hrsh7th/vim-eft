@@ -1,0 +1,69 @@
+*vim-eft* *eft*
+
+E(nhanded) (f)/(t).
+
+This plugin provides f / t / F / T that matches only word boundaries.
+
+
+==============================================================================
+CONTENTS                                                        *eft-contents*
+
+INSTALL                                                          |eft-install|
+VARIABLE                                                        |eft-variable|
+MAPPING                                                          |eft-mapping|
+
+
+
+==============================================================================
+INSTALL                                                          *eft-install*
+
+You can use your favorite plugin manager.
+
+>
+  " dein.vim
+  call dein#add('hrsh7th/vim-eft')
+
+  " vim-plug
+  Plug 'hrsh7th/vim-eft'
+<
+
+
+
+==============================================================================
+VARIABLE                                                        *eft-variable*
+
+>
+  let g:eft_ignorecase = v:false
+<
+    Enable ignorecase matching for input char.
+
+
+
+>
+  let g:eft_repeatable = v:false
+<
+    Specify enable or disable repeatable feature.
+
+
+
+==============================================================================
+MAPPING                                                          *eft-mapping*
+
+>
+  nmap f <Plug>(eft-f)
+  xmap f <Plug>(eft-f)
+  omap f <Plug>(eft-f)
+  nmap F <Plug>(eft-F)
+  xmap F <Plug>(eft-F)
+  omap F <Plug>(eft-F)
+  
+  nmap t <Plug>(eft-t)
+  xmap t <Plug>(eft-t)
+  omap t <Plug>(eft-t)
+  nmap T <Plug>(eft-T)
+  xmap T <Plug>(eft-T)
+  omap T <Plug>(eft-T)
+<
+
+
+

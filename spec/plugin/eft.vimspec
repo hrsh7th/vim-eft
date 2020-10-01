@@ -1,0 +1,157 @@
+let s:expect = themis#helper('expect')
+
+Describe eft
+
+  Describe same as native behavior
+    It should work as native f
+      for l:motion in ['fh', "\<Plug>(eft-f)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      endfor
+    End
+
+    It should work as native t
+      for l:motion in ['th', "\<Plug>(eft-t)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 8])
+      endfor
+    End
+
+    It should work as native F
+      for l:motion in ['Fh', "\<Plug>(eft-F)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 15])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      endfor
+    End
+
+    It should work as native T
+      for l:motion in ['Th', "\<Plug>(eft-T)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 15])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 10])
+      endfor
+    End
+
+    It should work as native df
+      for l:motion in ['dfh', "d\<Plug>(eft-f)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+        call s:expect(getline(1)).to_equal('ijklmn')
+      endfor
+    End
+
+    It should work as native dt
+      for l:motion in ['dth', "d\<Plug>(eft-t)h"]
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+        call s:expect(getline(1)).to_equal('hijklmn')
+      endfor
+    End
+  End
+
+  Describe f
+
+    It should match camel-case
+      enew!
+      call setline(1, ['CamelCase'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f)C", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 6])
+    End
+
+    It should match kebab-case
+      enew!
+      call setline(1, ['kebab-case'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 7])
+    End
+
+    It should match snake-case
+      enew!
+      call setline(1, ['snake_case'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 7])
+    End
+
+    It should match non-alphabetical chars
+      enew!
+      call setline(1, ['abcdefg;hijklmn'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f);", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 8])
+    End
+  End
+
+  Describe t
+    It should match camel-case
+      enew!
+      call setline(1, ['CamelCase'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-t)C", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
+    End
+
+    It should match kebab-case
+      enew!
+      call setline(1, ['kebab-case'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-t)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 6])
+    End
+
+    It should match snake-case
+      enew!
+      call setline(1, ['snake_case'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-t)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 6])
+    End
+
+    It should match non-alphabetical chars
+      enew!
+      call setline(1, ['abcdefg;hijklmn'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-t);", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 7])
+    End
+  End
+
+  Describe ignorease
+    It should match ignorecase
+      let g:eft_ignorecase = v:true
+      enew!
+      call setline(1, ['IgnoreCase'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 7])
+
+      enew!
+      call setline(1, ['IgnoreCase'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-t)c", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 6])
+      let g:eft_ignorecase = v:false
+    End
+  End
+
+End
+
