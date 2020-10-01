@@ -50,6 +50,9 @@ VARIABLE                                                        *eft-variable*
 MAPPING                                                          *eft-mapping*
 
 >
+  nmap ; <Plug>(eft-repeat)
+  xmap ; <Plug>(eft-repeat)
+
   nmap f <Plug>(eft-f)
   xmap f <Plug>(eft-f)
   omap f <Plug>(eft-f)

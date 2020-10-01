@@ -135,6 +135,20 @@ Describe eft
     End
   End
 
+  Describe ;
+    It should match ignorecase
+      enew!
+      call setline(1, ['aaa aaa aaa aaa'])
+      call cursor([1, 1])
+      call feedkeys("\<Plug>(eft-f)a", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
+      call feedkeys("\<Plug>(eft-repeat)", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      call feedkeys("\<Plug>(eft-repeat)", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 13])
+    End
+  End
+
   Describe ignorease
     It should match ignorecase
       let g:eft_ignorecase = v:true

@@ -1,25 +1,28 @@
 let s:state = {}
 
 "
-" eft#repeat_forward
+" eft#repeat
 "
-function! eft#repeat_forward(till) abort
-  if g:eft_repeatable && !empty(s:state) && s:state.mode ==# 'forward'
+function! eft#repeat() abort
+  if !empty(s:state)
     call eft#goto(s:state.mode, s:state.till, s:state.char)
   else
-    call eft#goto('forward', a:till, '')
+    call feedkeys(';', 'n')
   endif
 endfunction
 
 "
-" eft#repeat_backward
+" eft#forward
 "
-function! eft#repeat_backward(till) abort
-  if g:eft_repeatable && !empty(s:state) && s:state.mode ==# 'backward'
-    call eft#goto(s:state.mode, s:state.till, s:state.char)
-  else
-    call eft#goto('backward', a:till, '')
-  endif
+function! eft#forward(till) abort
+  call eft#goto('forward', a:till, '')
+endfunction
+
+"
+" eft#backward
+"
+function! eft#backward(till) abort
+  call eft#goto('backward', a:till, '')
 endfunction
 
 "
