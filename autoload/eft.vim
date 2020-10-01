@@ -15,7 +15,7 @@ endfunction
 "
 function! eft#repeat() abort
   if !empty(s:state)
-    call eft#goto(s:state.mode, s:state.till, s:state.char)
+    call eft#goto(s:state.dir, s:state.till, s:state.char)
   else
     call feedkeys(';', 'n')
   endif
@@ -25,7 +25,7 @@ endfunction
 " eft#forward
 "
 function! eft#forward(till, repeat) abort
-  if a:repeat && !empty(s:state) && s:state.mode ==# 'forward'
+  if a:repeat && s:repeatable({ 'dir': 'forward', 'till': a:till })
     call eft#goto('forward', a:till, s:state.char)
   else
     call eft#goto('forward', a:till, '')
@@ -36,7 +36,7 @@ endfunction
 " eft#backward
 "
 function! eft#backward(till, repeat) abort
-  if a:repeat && !empty(s:state) && s:state.mode ==# 'backward'
+  if a:repeat && s:repeatable({ 'dir': 'backward', 'till': a:till })
     call eft#goto('backward', a:till, s:state.char)
   else
     call eft#goto('backward', a:till, '')
@@ -46,17 +46,18 @@ endfunction
 "
 " eft#goto
 "
-function! eft#goto(mode, till, char) abort
+function! eft#goto(dir, till, char) abort
   augroup eft
     autocmd!
   augroup END
 
-  let s:state.mode = a:mode
+  let s:state.dir = a:dir
+  let s:state.mode = mode(1)
   let s:state.till = a:till
   let s:state.char = empty(a:char) ? nr2char(getchar()) : a:char
-  if s:state.mode ==# 'forward'
+  if s:state.dir ==# 'forward'
     call s:forward(s:state.till, s:state.char)
-  elseif s:state.mode ==# 'backward'
+  elseif s:state.dir ==# 'backward'
     call s:backward(s:state.till, s:state.char)
   endif
 
@@ -94,6 +95,13 @@ function! eft#index(text, index) abort
 endfunction
 
 "
+" repeatable
+"
+function! s:repeatable(expect) abort
+  return !empty(s:state) && s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == mode(1)
+endfunction
+
+"
 " reserve_reset
 "
 function! s:reserve_reset() abort
@@ -107,18 +115,13 @@ endfunction
 " forward
 "
 function! s:forward(till, char) abort
-  let l:after_line = getline('.')[col('.') - (mode()[0] ==# 'i' ? 1 : 0) : -1]
+  let l:after_line = getline('.')[col('.') - (mode(1)[0] ==# 'i' ? 1 : 0) : -1]
   let l:offset = s:compute_offset(l:after_line, a:char, 1)
   if l:offset != -1
     if a:till
       let l:offset = l:offset - 1
     endif
-
-    if index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
-      execute printf('normal! v%s|', col('.') + l:offset + 1)
-    else
-      execute printf('normal! %s|', col('.') + l:offset + 1)
-    endif
+    call s:motion(col('.') + l:offset + 1)
   endif
 endfunction
 
@@ -126,17 +129,24 @@ endfunction
 " backword
 "
 function! s:backward(till, char) abort
-  let l:before_line = getline('.')[0 : col('.') - (mode()[0] ==# 'i' ? 2 : 1)]
+  let l:before_line = getline('.')[0 : col('.') - (mode(1)[0] ==# 'i' ? 2 : 1)]
   let l:offset = s:compute_offset(l:before_line, a:char, -1)
   if l:offset != -1
     if !a:till
       let l:offset = l:offset - 1
     endif
-    if index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
-      execute printf('normal! v%s|', l:offset + 1)
-    else
-      execute printf('normal! %s|', l:offset + 1)
-    endif
+    call s:motion(l:offset + 1)
+  endif
+endfunction
+
+"
+" motion
+"
+function! s:motion(col) abort
+  if index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
+    execute printf('normal! v%s|', a:col)
+  else
+    execute printf('normal! %s|', a:col)
   endif
 endfunction
 

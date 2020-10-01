@@ -148,8 +148,9 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
       call feedkeys("\<Plug>(eft-f-repeatable)", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call feedkeys("\<Plug>(eft-f-repeatable)", 'x')
-      call s:expect(getpos('.')[1 : 2]).to_equal([1, 13])
+      call feedkeys("d\<Plug>(eft-t-repeatable)a", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      call s:expect(getline('.')).to_equal('aaa aaa aaa')
     End
   End
 
@@ -162,8 +163,9 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
       call feedkeys("\<Plug>(eft-repeat)", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call feedkeys("\<Plug>(eft-repeat)", 'x')
-      call s:expect(getpos('.')[1 : 2]).to_equal([1, 13])
+      call feedkeys("d\<Plug>(eft-t)a", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+      call s:expect(getline('.')).to_equal('aaa aaa aaa')
     End
   End
 
