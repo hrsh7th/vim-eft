@@ -47,6 +47,11 @@ VARIABLE                                                        *eft-variable*
     1. `EftChar`
     2. `EftSubChar`
 
+>
+  let g:eft_index_function = { 'head': ..., 'tail': ..., 'camel': ..., 'symbol': ... }
+<
+
+  Specify function that detects jumpable index.
 
 ==============================================================================
 MAPPING                                                          *eft-mapping*
