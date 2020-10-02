@@ -47,7 +47,7 @@ function! eft#forward(till, repeat) abort
     endfor
   endif
 
-  if empty(s:state.char) || s:state.char !~# '[:print:]'
+  if empty(s:state.char) || s:state.char !~# '[[:print:][:blank:]]'
     return eft#clear()
   endif
 
@@ -83,7 +83,7 @@ function! eft#backward(till, repeat) abort
     endfor
   endif
 
-  if empty(s:state.char) || s:state.char !~# '[:print:]'
+  if empty(s:state.char) || s:state.char !~# '[[:print:][:blank:]]'
     return eft#clear()
   endif
 
