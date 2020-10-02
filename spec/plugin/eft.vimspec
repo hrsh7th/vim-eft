@@ -141,7 +141,6 @@ Describe eft
 
   Describe highlight
     It should highlight for normal mode
-      let g:eft_highlight = v:true
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
@@ -151,11 +150,9 @@ Describe eft
       call l:Clear_highlight()
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
-      let g:eft_highlight = v:false
     End
 
     It should highlight for operator-pdingin mode
-      let g:eft_highlight = v:true
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
@@ -165,7 +162,6 @@ Describe eft
       call l:Clear_highlight()
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
-      let g:eft_highlight = v:false
     End
   End
 

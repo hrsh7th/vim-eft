@@ -65,15 +65,18 @@ function! eft#highlight(line, indices, is_operator_pending) abort
   for l:i in a:indices
     if s:index(a:line, l:i)
       let l:char = a:line[l:i]
-      let l:chars[l:char] = get(l:chars, l:char, 0) + 1
+      if !has_key(l:chars, l:char)
+        let l:chars[l:char] = 0
+      endif
+      let l:chars[l:char] = l:chars[l:char] + 1
       let l:config = get(g:eft_highlight, l:chars[l:char], get(g:eft_highlight, 'n', v:null))
 
       let l:ok = v:true
       let l:ok = l:ok && l:config isnot# v:null
-      let l:ok = l:ok && (!get(l:config, 'allow_space', v:false) || l:char !~# '[:blank:]')
-      let l:ok = l:ok && (!get(l:config, 'allow_operator', v:false) || !s:is_operator_pending())
+      let l:ok = l:ok && (get(l:config, 'allow_space', v:false) || l:char !~# '[[:blank:]]')
+      let l:ok = l:ok && (get(l:config, 'allow_operator', v:false) || !s:is_operator_pending())
       if l:ok
-        let l:highs += [[l:config.highlight, l:i + 1]]
+        call add(l:highs, [l:config.highlight, l:i + 1, l:char])
       endif
     endif
   endfor

@@ -28,20 +28,20 @@ let g:eft_index_function = get(g:, 'eft_index_function', {
 
 if !hlexists('EftChar')
   highlight! default EftChar
-  \   gui=bold
+  \   gui=bold,underline
   \   guifg=Orange
   \   guibg=NONE
-  \   cterm=bold
+  \   cterm=bold,underline
   \   ctermfg=Red
   \   ctermbg=NONE
 endif
 
 if !hlexists('EftSubChar')
   highlight! default EftSubChar
-  \   gui=bold
+  \   gui=bold,underline
   \   guifg=Gray
   \   guibg=NONE
-  \   cterm=bold
+  \   cterm=bold,underline
   \   ctermfg=Gray
   \   ctermbg=NONE
 endif

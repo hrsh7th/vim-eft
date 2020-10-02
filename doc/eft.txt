@@ -44,7 +44,7 @@ VARIABLE                                                        *eft-variable*
     let g:eft_highlight = {
     \   '1': {
     \     'highlight': 'EftChar',
-    \     'allow_space': v:false,
+    \     'allow_space': v:true,
     \     'allow_operator': v:true,
     \   },
     \   '2': {
