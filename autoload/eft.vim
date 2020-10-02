@@ -215,6 +215,7 @@ function! s:getchar() abort
   else
     let l:char = nr2char(getchar())
   endif
+  redraw
   if l:char =~# '[[:print:][:blank:]]'
     return l:char
   endif
