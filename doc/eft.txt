@@ -32,26 +32,39 @@ You can use your favorite plugin manager.
 ==============================================================================
 VARIABLE                                                        *eft-variable*
 
+*g:eft_ignorecase*
+
+  Specify enable or disable ignorecase matching.
+
+
+*g:eft_highlight*
+
+  Specify enable or disable highlight feature.
+
+  You can customize following two highlight groups.
+
+  1. `EftChar`
+  2. `EftSubChar`
+
+
+*g:eft_index_function*
+
+  The index function can be customized as follows.
 >
-  let g:eft_ignorecase = v:false
+    let g:eft_index_function = {
+    \   'head': function('eft#index#head'),
+    \   'tail': function('eft#index#tail'),
+    \   'camel': function('eft#index#camel'),
+    \   'space': function('eft#index#space'),
+    \   'symbol': function('eft#index#symbol'),
+    \ }
+
+    or
+
+    let g:eft_index_function = {
+    \   'all': { -> v:true }
+    \ }
 <
-    Specify enable or disable ignorecase matching.
-
->
-  let g:eft_highlight = v:false
-<
-    Specify enable or disable highlight feature.
-
-    You can customize following two highlight groups.
-
-    1. `EftChar`
-    2. `EftSubChar`
-
->
-  let g:eft_index_function = { 'head': ..., 'tail': ..., 'camel': ..., 'space': ..., 'symbol': ... }
-<
-
-  Specify function that detects jumpable index.
 
 ==============================================================================
 MAPPING                                                          *eft-mapping*
