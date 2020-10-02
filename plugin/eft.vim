@@ -9,12 +9,12 @@ let g:eft_highlight = get(g:, 'eft_highlight', {
 \   '1': {
 \     'highlight': 'EftChar',
 \     'allow_space': v:true,
-\     'allow_operator_pending': v:true,
+\     'allow_operator': v:true,
 \   },
 \   '2': {
 \     'highlight': 'EftSubChar',
 \     'allow_space': v:false,
-\     'allow_operator_pending': v:false,
+\     'allow_operator': v:false,
 \   }
 \ })
 

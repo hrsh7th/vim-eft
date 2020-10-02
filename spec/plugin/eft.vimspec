@@ -140,19 +140,32 @@ Describe eft
   End
 
   Describe highlight
+    It should not highlight
+      enew!
+      let l:highlight = g:eft_highlight
+      let g:eft_highlight = {}
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
+      call l:Clear_highlight()
+      let g:eft_highlight = l:highlight
+    End
+
     It should highlight for normal mode
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
       let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(3) " 'a', 'b', ' '
-      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(8 - 2) " -2 for ignoring space.
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(2) " -2 for ignoring space.
       call l:Clear_highlight()
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
     End
 
-    It should highlight for operator-pdingin mode
+    It should highlight for operator-pending mode
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
@@ -165,7 +178,7 @@ Describe eft
     End
   End
 
-  Describe repeat
+  Describe repeatable
     It should repeat
       enew!
       call setline(1, ['abb abb abb abb'])

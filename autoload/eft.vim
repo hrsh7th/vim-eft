@@ -74,7 +74,7 @@ function! eft#highlight(line, indices, is_operator_pending) abort
       let l:ok = v:true
       let l:ok = l:ok && l:config isnot# v:null
       let l:ok = l:ok && (get(l:config, 'allow_space', v:false) || l:char !~# '[[:blank:]]')
-      let l:ok = l:ok && (get(l:config, 'allow_operator', v:false) || !s:is_operator_pending())
+      let l:ok = l:ok && (get(l:config, 'allow_operator', v:false) || !a:is_operator_pending)
       if l:ok
         call add(l:highs, [l:config.highlight, l:i + 1, l:char])
       endif
