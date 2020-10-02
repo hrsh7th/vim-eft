@@ -33,8 +33,7 @@ function! eft#forward(till, repeat) abort
   let s:state.dir = 'forward'
   let s:state.mode = mode(1)
   let s:state.till = a:till
-  call eft#goto(l:repeat)
-  return ''
+  return eft#goto(l:repeat)
 endfunction
 
 "
@@ -45,8 +44,7 @@ function! eft#backward(till, repeat) abort
   let s:state.dir = 'backward'
   let s:state.mode = mode(1)
   let s:state.till = a:till
-  call eft#goto(l:repeat)
-  return ''
+  return eft#goto(l:repeat)
 endfunction
 
 "
@@ -66,21 +64,20 @@ function! eft#goto(repeat) abort
     call l:Clear_highlight()
   endif
 
-  if empty(s:state.char)
-    return eft#clear()
-  endif
-
-  call s:reserve_reset()
-
-  let l:col = s:compute_col(l:line, l:indices, s:state.char)
-  if l:col != -1
-    if s:state.dir ==# 'forward' && s:state.till
-      let l:col = l:col - 1
-    elseif s:state.dir ==# 'backward' && s:state.till
-      let l:col = l:col + 1
+  if !empty(s:state.char)
+    call s:reserve_reset()
+    let l:col = s:compute_col(l:line, l:indices, s:state.char)
+    if l:col != -1
+      if s:state.dir ==# 'forward' && s:state.till
+        let l:col = l:col - 1
+      elseif s:state.dir ==# 'backward' && s:state.till
+        let l:col = l:col + 1
+      endif
+      call s:motion(l:col)
+      return ''
     endif
-    call s:motion(l:col)
-  endif
+  end
+  return s:is_operator_pending() ? "\<Esc>" : ''
 endfunction
 
 "
