@@ -47,6 +47,10 @@ function! eft#forward(till, repeat) abort
     endfor
   endif
 
+  if empty(s:state.char) || s:state.char !~# '[:print:]'
+    return eft#clear()
+  endif
+
   let l:offset = s:compute_offset('forward', l:after_line, s:state.char)
   if l:offset != -1
     if a:till
@@ -77,6 +81,10 @@ function! eft#backward(till, repeat) abort
         call matchdelete(l:match.id)
       endif
     endfor
+  endif
+
+  if empty(s:state.char) || s:state.char !~# '[:print:]'
+    return eft#clear()
   endif
 
   let l:offset = s:compute_offset('backward', l:before_line, s:state.char)
