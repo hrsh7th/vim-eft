@@ -16,6 +16,18 @@ Describe eft
         call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       endfor
     End
+    It should work as native f in visual-mode
+      for l:motion in ["vfh\<Plug>(eft-assert)", "v\<Plug>(eft-f)h\<Plug>(eft-assert)"]
+        let g:eft_assert = {}
+        function! g:eft_assert.step1() abort
+          call s:expect(mode()).to_equal('v')
+        endfunction
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+      endfor
+    End
 
     It should work as native t
       for l:motion in ['th', "\<Plug>(eft-t)h"]
@@ -24,6 +36,19 @@ Describe eft
         call cursor([1, 1])
         call feedkeys(l:motion, 'x')
         call s:expect(getpos('.')[1 : 2]).to_equal([1, 8])
+      endfor
+    End
+
+    It should work as native t in visual-mode
+      for l:motion in ["vth\<Plug>(eft-assert)", "v\<Plug>(eft-t)h\<Plug>(eft-assert)"]
+        let g:eft_assert = {}
+        function! g:eft_assert.step1() abort
+          call s:expect(mode()).to_equal('v')
+        endfunction
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
       endfor
     End
 
