@@ -3,7 +3,28 @@ if exists('g:loaded_eft')
 endif
 let g:loaded_eft = v:true
 
+let g:eft_highlight = get(g:, 'eft_highlight', v:false)
 let g:eft_ignorecase = get(g:, 'eft_ignorecase', v:false)
+
+if !hlexists('EftChar')
+  highlight! default EftChar
+  \ gui=bold,underline
+  \ guifg=Orange
+  \ guibg=NONE
+  \ cterm=bold,underline
+  \ ctermfg=Red
+  \ ctermbg=NONE
+endif
+
+if !hlexists('EftSubChar')
+  highlight! default EftSubChar
+  \ gui=bold,underline
+  \ guifg=Gray
+  \ guibg=NONE
+  \ cterm=bold,underline
+  \ ctermfg=Gray
+  \ ctermbg=NONE
+endif
 
 nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
 xnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>

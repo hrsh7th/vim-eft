@@ -35,8 +35,17 @@ VARIABLE                                                        *eft-variable*
 >
   let g:eft_ignorecase = v:false
 <
-    Enable ignorecase matching for input char.
+    Specify enable or disable ignorecase matching.
 
+>
+  let g:eft_highlight = v:false
+<
+    Specify enable or disable highlight feature.
+
+    You can customize highlights for following two groups.
+
+    1. `EftChar`
+    2. `EftSubChar`
 
 
 ==============================================================================
