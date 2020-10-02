@@ -3,8 +3,8 @@ if exists('g:loaded_eft')
 endif
 let g:loaded_eft = v:true
 
-let g:eft_highlight = get(g:, 'eft_highlight', v:false)
 let g:eft_ignorecase = get(g:, 'eft_ignorecase', v:false)
+let g:eft_highlight = get(g:, 'eft_highlight', v:false)
 let g:eft_index_function = get(g:, 'eft_index_function', {
 \   'head': function('eft#index#head'),
 \   'tail': function('eft#index#tail'),

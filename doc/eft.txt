@@ -42,7 +42,7 @@ VARIABLE                                                        *eft-variable*
 <
     Specify enable or disable highlight feature.
 
-    You can customize highlights for following two groups.
+    You can customize following two highlight groups.
 
     1. `EftChar`
     2. `EftSubChar`
@@ -90,6 +90,4 @@ MAPPING                                                          *eft-mapping*
   xmap T <Plug>(eft-T-repeatable)
   omap T <Plug>(eft-T-repeatable)
 <
-
-
 
