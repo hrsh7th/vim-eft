@@ -34,6 +34,7 @@ function! eft#forward(till, repeat) abort
   let s:state.mode = mode(1)
   let s:state.till = a:till
   call s:goto(l:repeat)
+  return ''
 endfunction
 
 "
@@ -45,6 +46,7 @@ function! eft#backward(till, repeat) abort
   let s:state.mode = mode(1)
   let s:state.till = a:till
   call s:goto(l:repeat)
+  return ''
 endfunction
 
 "
@@ -138,9 +140,9 @@ function! s:motion(col) abort
   augroup END
 
   if s:is_operator_pending()
-    execute printf('normal! v%s|', a:col)
+    call feedkeys(printf('v%s|', a:col), 'n')
   else
-    execute printf('normal! %s|', a:col)
+    call feedkeys(printf('%s|', a:col), 'n')
   endif
 endfunction
 

@@ -33,34 +33,34 @@ if !hlexists('EftSubChar')
   \   ctermbg=NONE
 endif
 
-nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
-xnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
+nnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
+xnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
 
-nnoremap <silent> <Plug>(eft-f) :<C-u>call eft#forward(v:false, v:false)<CR>
-nnoremap <silent> <Plug>(eft-t) :<C-u>call eft#forward(v:true, v:false)<CR>
-xnoremap <silent> <Plug>(eft-f) :<C-u>call eft#forward(v:false, v:false)<CR>
-xnoremap <silent> <Plug>(eft-t) :<C-u>call eft#forward(v:true, v:false)<CR>
-onoremap <silent> <Plug>(eft-f) :<C-u>call eft#forward(v:false, v:false)<CR>
-onoremap <silent> <Plug>(eft-t) :<C-u>call eft#forward(v:true, v:false)<CR>
+nnoremap <silent><expr> <Plug>(eft-f) eft#forward(v:false, v:false)
+nnoremap <silent><expr> <Plug>(eft-t) eft#forward(v:true, v:false)
+xnoremap <silent><expr> <Plug>(eft-f) eft#forward(v:false, v:false)
+xnoremap <silent><expr> <Plug>(eft-t) eft#forward(v:true, v:false)
+onoremap <silent><expr> <Plug>(eft-f) eft#forward(v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-t) eft#forward(v:true, v:false)
 
-nnoremap <silent> <Plug>(eft-F) :<C-u>call eft#backward(v:false, v:false)<CR>
-nnoremap <silent> <Plug>(eft-T) :<C-u>call eft#backward(v:true, v:false)<CR>
-xnoremap <silent> <Plug>(eft-F) :<C-u>call eft#backward(v:false, v:false)<CR>
-xnoremap <silent> <Plug>(eft-T) :<C-u>call eft#backward(v:true, v:false)<CR>
-onoremap <silent> <Plug>(eft-F) :<C-u>call eft#backward(v:false, v:false)<CR>
-onoremap <silent> <Plug>(eft-T) :<C-u>call eft#backward(v:true, v:false)<CR>
+nnoremap <silent><expr> <Plug>(eft-F) eft#backward(v:false, v:false)
+nnoremap <silent><expr> <Plug>(eft-T) eft#backward(v:true, v:false)
+xnoremap <silent><expr> <Plug>(eft-F) eft#backward(v:false, v:false)
+xnoremap <silent><expr> <Plug>(eft-T) eft#backward(v:true, v:false)
+onoremap <silent><expr> <Plug>(eft-F) eft#backward(v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-T) eft#backward(v:true, v:false)
 
-nnoremap <silent> <Plug>(eft-f-repeatable) :<C-u>call eft#forward(v:false, v:true)<CR>
-nnoremap <silent> <Plug>(eft-t-repeatable) :<C-u>call eft#forward(v:true, v:true)<CR>
-xnoremap <silent> <Plug>(eft-f-repeatable) :<C-u>call eft#forward(v:false, v:true)<CR>
-xnoremap <silent> <Plug>(eft-t-repeatable) :<C-u>call eft#forward(v:true, v:true)<CR>
-onoremap <silent> <Plug>(eft-f-repeatable) :<C-u>call eft#forward(v:false, v:true)<CR>
-onoremap <silent> <Plug>(eft-t-repeatable) :<C-u>call eft#forward(v:true, v:true)<CR>
+nnoremap <silent><expr> <Plug>(eft-f-repeatable) eft#forward(v:false, v:true)
+nnoremap <silent><expr> <Plug>(eft-t-repeatable) eft#forward(v:true, v:true)
+xnoremap <silent><expr> <Plug>(eft-f-repeatable) eft#forward(v:false, v:true)
+xnoremap <silent><expr> <Plug>(eft-t-repeatable) eft#forward(v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-f-repeatable) eft#forward(v:false, v:true)
+onoremap <silent><expr> <Plug>(eft-t-repeatable) eft#forward(v:true, v:true)
 
-nnoremap <silent> <Plug>(eft-F-repeatable) :<C-u>call eft#backward(v:false, v:true)<CR>
-nnoremap <silent> <Plug>(eft-T-repeatable) :<C-u>call eft#backward(v:true, v:true)<CR>
-xnoremap <silent> <Plug>(eft-F-repeatable) :<C-u>call eft#backward(v:false, v:true)<CR>
-xnoremap <silent> <Plug>(eft-T-repeatable) :<C-u>call eft#backward(v:true, v:true)<CR>
-onoremap <silent> <Plug>(eft-F-repeatable) :<C-u>call eft#backward(v:false, v:true)<CR>
-onoremap <silent> <Plug>(eft-T-repeatable) :<C-u>call eft#backward(v:true, v:true)<CR>
+nnoremap <silent><expr> <Plug>(eft-F-repeatable) eft#backward(v:false, v:true)
+nnoremap <silent><expr> <Plug>(eft-T-repeatable) eft#backward(v:true, v:true)
+xnoremap <silent><expr> <Plug>(eft-F-repeatable) eft#backward(v:false, v:true)
+xnoremap <silent><expr> <Plug>(eft-T-repeatable) eft#backward(v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-F-repeatable) eft#backward(v:false, v:true)
+onoremap <silent><expr> <Plug>(eft-T-repeatable) eft#backward(v:true, v:true)
 
