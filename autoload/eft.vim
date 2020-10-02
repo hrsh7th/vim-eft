@@ -169,7 +169,7 @@ function! s:highlight(dir, line, offset_col) abort
         if !get(l:chars, a:line[l:i], v:false)
           let l:chars[a:line[l:i]] = v:true
           let l:curr += [l:i]
-        else
+        elseif a:line[l:i] !=# ' '
           let l:next += [l:i]
         endif
       endif
@@ -180,7 +180,7 @@ function! s:highlight(dir, line, offset_col) abort
         if !get(l:chars, a:line[l:i], v:false)
           let l:chars[a:line[l:i]] = v:true
           let l:curr += [l:i]
-        else
+        elseif a:line[l:i] !=# ' '
           let l:next += [l:i]
         endif
       endif
