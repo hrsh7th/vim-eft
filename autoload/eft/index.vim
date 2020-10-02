@@ -11,6 +11,10 @@ function! eft#index#camel(state, text, index) abort
 endfunction
 
 function! eft#index#symbol(state, text, index) abort
-  return a:text[a:index] =~# '\A'
+  return a:text[a:index] !~# '\s' && a:text[a:index] =~# '\A'
+endfunction
+
+function! eft#index#space(state, text, index) abort
+  return a:text[a:index - 1] !~# '\s' && a:text[a:index] =~# '\s'
 endfunction
 

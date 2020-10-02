@@ -9,6 +9,7 @@ let g:eft_index_function = get(g:, 'eft_index_function', {
 \   'head': function('eft#index#head'),
 \   'tail': function('eft#index#tail'),
 \   'camel': function('eft#index#camel'),
+\   'space': function('eft#index#space'),
 \   'symbol': function('eft#index#symbol'),
 \ })
 

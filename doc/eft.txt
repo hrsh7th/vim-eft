@@ -48,7 +48,7 @@ VARIABLE                                                        *eft-variable*
     2. `EftSubChar`
 
 >
-  let g:eft_index_function = { 'head': ..., 'tail': ..., 'camel': ..., 'symbol': ... }
+  let g:eft_index_function = { 'head': ..., 'tail': ..., 'camel': ..., 'space': ..., 'symbol': ... }
 <
 
   Specify function that detects jumpable index.
