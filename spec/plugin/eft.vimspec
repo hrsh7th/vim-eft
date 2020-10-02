@@ -16,6 +16,18 @@ Describe eft
         call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       endfor
     End
+    It should work as native f in visual-mode
+      for l:motion in ["vfh\<Plug>(eft-assert)", "v\<Plug>(eft-f)h\<Plug>(eft-assert)"]
+        let g:eft_assert = {}
+        function! g:eft_assert.step1() abort
+          call s:expect(mode()).to_equal('v')
+        endfunction
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
+      endfor
+    End
 
     It should work as native t
       for l:motion in ['th', "\<Plug>(eft-t)h"]
@@ -24,6 +36,19 @@ Describe eft
         call cursor([1, 1])
         call feedkeys(l:motion, 'x')
         call s:expect(getpos('.')[1 : 2]).to_equal([1, 8])
+      endfor
+    End
+
+    It should work as native t in visual-mode
+      for l:motion in ["vth\<Plug>(eft-assert)", "v\<Plug>(eft-t)h\<Plug>(eft-assert)"]
+        let g:eft_assert = {}
+        function! g:eft_assert.step1() abort
+          call s:expect(mode()).to_equal('v')
+        endfunction
+        enew!
+        call setline(1, ['abcdefg hijklmn'])
+        call cursor([1, 1])
+        call feedkeys(l:motion, 'x')
       endfor
     End
 
@@ -139,10 +164,49 @@ Describe eft
     End
   End
 
-  Describe repeat
+  Describe highlight
+    It should not highlight
+      enew!
+      let l:highlight = g:eft_highlight
+      let g:eft_highlight = {}
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
+      call l:Clear_highlight()
+      let g:eft_highlight = l:highlight
+    End
+
+    It should highlight for normal mode
+      enew!
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(3) " 'a', 'b', ' '
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(2) " -2 for ignoring space.
+      call l:Clear_highlight()
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
+    End
+
+    It should highlight for operator-pending mode
+      enew!
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:true)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(3) " 'a', 'b', ' '
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
+      call l:Clear_highlight()
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
+      call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
+    End
+  End
+
+  Describe repeatable
     It should repeat
       enew!
-      call setline(1, ['aaa aaa aaa aaa'])
+      call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
       call feedkeys("\<Plug>(eft-f-repeatable)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
@@ -150,14 +214,14 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       call feedkeys("d\<Plug>(eft-t-repeatable)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call s:expect(getline('.')).to_equal('aaa aaa aaa')
+      call s:expect(getline('.')).to_equal('abb abb abb')
     End
   End
 
   Describe ;
     It should repeat
       enew!
-      call setline(1, ['aaa aaa aaa aaa'])
+      call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
       call feedkeys("\<Plug>(eft-f)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
@@ -165,7 +229,7 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       call feedkeys("d\<Plug>(eft-t)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call s:expect(getline('.')).to_equal('aaa aaa aaa')
+      call s:expect(getline('.')).to_equal('abb abb abb')
     End
   End
 

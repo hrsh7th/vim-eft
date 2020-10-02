@@ -15,7 +15,11 @@ endfunction
 "
 function! eft#repeat() abort
   if !empty(s:state)
-    call eft#goto(s:state.dir, s:state.till, s:state.char)
+    if s:state.dir ==# 'forward'
+      call eft#forward(s:state.till, v:true)
+    else
+      call eft#backward(s:state.till, v:true)
+    endif
   else
     call feedkeys(';', 'n')
   endif
@@ -25,148 +29,136 @@ endfunction
 " eft#forward
 "
 function! eft#forward(till, repeat) abort
-  if a:repeat && s:repeatable({ 'dir': 'forward', 'till': a:till })
-    call eft#goto('forward', a:till, s:state.char)
-  else
-    call eft#goto('forward', a:till, '')
-  endif
+  let l:repeat = a:repeat && s:repeatable({ 'dir': 'forward', 'till': a:till })
+  let s:state.dir = 'forward'
+  let s:state.mode = mode(1)
+  let s:state.till = a:till
+  call s:goto(l:repeat)
+  return ''
 endfunction
 
 "
 " eft#backward
 "
 function! eft#backward(till, repeat) abort
-  if a:repeat && s:repeatable({ 'dir': 'backward', 'till': a:till })
-    call eft#goto('backward', a:till, s:state.char)
-  else
-    call eft#goto('backward', a:till, '')
-  endif
-endfunction
-
-"
-" eft#goto
-"
-function! eft#goto(dir, till, char) abort
-  augroup eft
-    autocmd!
-  augroup END
-
-  let s:state.dir = a:dir
+  let l:repeat = a:repeat && s:repeatable({ 'dir': 'backward', 'till': a:till })
+  let s:state.dir = 'backward'
   let s:state.mode = mode(1)
   let s:state.till = a:till
-  let s:state.char = empty(a:char) ? nr2char(getchar()) : a:char
-  if s:state.dir ==# 'forward'
-    call s:forward(s:state.till, s:state.char)
-  elseif s:state.dir ==# 'backward'
-    call s:backward(s:state.till, s:state.char)
-  endif
-
-  call timer_start(0, { -> s:reserve_reset() })
+  call s:goto(l:repeat)
+  return ''
 endfunction
 
 "
-" eft#index
+" highlight
 "
-function! eft#index(text, index) abort
-  if a:index == 0
-    return v:true
+" NOTE: public for test.
+"
+function! eft#highlight(line, indices, is_operator_pending) abort
+  if empty(g:eft_highlight)
+    return { -> {} }
   endif
 
-  if strlen(a:text) - 1 == a:index
-    return v:true
-  endif
+  let l:chars = {}
+  let l:highs = []
 
-  " symbols
-  if a:text[a:index] =~# '\A'
-    return v:true
-  endif
+  for l:i in a:indices
+    if s:index(a:line, l:i)
+      let l:char = a:line[l:i]
+      if !has_key(l:chars, l:char)
+        let l:chars[l:char] = 0
+      endif
+      let l:chars[l:char] = l:chars[l:char] + 1
+      let l:config = get(g:eft_highlight, l:chars[l:char], get(g:eft_highlight, 'n', v:null))
 
-  " boundaly
-  if a:text[a:index - 1] =~# '\A' && a:text[a:index] =~# '\a'
-    return v:true
-  endif
-
-  " camel
-  if a:text[a:index - 1] =~# '\U' && a:text[a:index] =~# '\u'
-    return v:true
-  endif
-
-  return v:false
-endfunction
-
-"
-" repeatable
-"
-function! s:repeatable(expect) abort
-  return !empty(s:state) && s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == mode(1)
-endfunction
-
-"
-" reserve_reset
-"
-function! s:reserve_reset() abort
-  augroup eft
-    autocmd!
-    autocmd BufEnter,InsertEnter,CursorMoved <buffer> ++once let s:state = {}
-  augroup END
-endfunction
-
-"
-" forward
-"
-function! s:forward(till, char) abort
-  let l:after_line = getline('.')[col('.') - (mode(1)[0] ==# 'i' ? 1 : 0) : -1]
-  let l:offset = s:compute_offset(l:after_line, a:char, 1)
-  if l:offset != -1
-    if a:till
-      let l:offset = l:offset - 1
+      let l:ok = v:true
+      let l:ok = l:ok && l:config isnot# v:null
+      let l:ok = l:ok && (get(l:config, 'allow_space', v:false) || l:char !~# '[[:blank:]]')
+      let l:ok = l:ok && (get(l:config, 'allow_operator', v:false) || !a:is_operator_pending)
+      if l:ok
+        call add(l:highs, [l:config.highlight, l:i + 1, l:char])
+      endif
     endif
-    call s:motion(col('.') + l:offset + 1)
-  endif
+  endfor
+
+  let l:ids = map(l:highs, 'matchaddpos(v:val[0], [[line("."), v:val[1]]])')
+  redraw
+  return { -> map(l:ids, 'matchdelete(v:val)') }
 endfunction
 
 "
-" backword
+" goto
 "
-function! s:backward(till, char) abort
-  let l:before_line = getline('.')[0 : col('.') - (mode(1)[0] ==# 'i' ? 2 : 1)]
-  let l:offset = s:compute_offset(l:before_line, a:char, -1)
+function! s:goto(repeat) abort
+  let l:line = getline('.')
+  let l:indices = s:state.dir ==# 'forward'
+  \   ? range(col('.'), col('$') - 1)
+  \   : range(col('.') - 2, 0, -1)
+
+  if !a:repeat
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, s:is_operator_pending())
+    let s:state.char = s:getchar()
+    call l:Clear_highlight()
+  endif
+
+  if empty(s:state.char)
+    return eft#clear()
+  endif
+
+  call s:reserve_reset()
+
+  let l:offset = s:compute_offset(l:line, l:indices, s:state.char)
   if l:offset != -1
-    if !a:till
+    if s:state.dir ==# 'forward' && s:state.till
       let l:offset = l:offset - 1
+    elseif s:state.dir ==# 'backward' && s:state.till
+      let l:offset = l:offset + 1
     endif
     call s:motion(l:offset + 1)
   endif
 endfunction
 
 "
+" index
+"
+function! s:index(text, index) abort
+  if a:index == 0 || strlen(a:text) - 1 == a:index " ignore chars to adjacent to cursor
+    return v:true
+  endif
+
+  for [l:name, l:Index] in items(g:eft_index_function)
+    if l:Index(s:state, a:text, a:index)
+      return v:true
+    endif
+  endfor
+
+  return v:false
+endfunction
+
+"
 " motion
 "
 function! s:motion(col) abort
-  if index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
-    execute printf('normal! v%s|', a:col)
+  augroup eft
+    autocmd!
+  augroup END
+
+  if s:is_operator_pending()
+    call feedkeys(printf('v%s|', a:col), 'n')
   else
-    execute printf('normal! %s|', a:col)
+    call feedkeys(printf('%s|', a:col), 'n')
   endif
 endfunction
 
 "
 " compute_offset
 "
-function! s:compute_offset(line, char, dir) abort
-  if a:dir == 1
-    for l:i in range(0, strlen(a:line) - 1)
-      if l:i != 0 && eft#index(a:line, l:i) && s:match(a:line[l:i], a:char)
-        return l:i
-      endif
-    endfor
-  else
-    for l:i in range(strlen(a:line) - 1, 0, -1)
-      if l:i != (strlen(a:line) - 1) && eft#index(a:line, l:i) && s:match(a:line[l:i], a:char)
-        return l:i + 1
-      endif
-    endfor
-  endif
+function! s:compute_offset(line, indices, char) abort
+  for l:i in a:indices
+    if l:i != 0 && s:index(a:line, l:i) && s:match(a:line[l:i], a:char)
+      return l:i
+    endif
+  endfor
   return -1
 endfunction
 
@@ -178,5 +170,55 @@ function! s:match(char1, char2) abort
     return a:char1 ==? a:char2
   endif
   return a:char1 ==# a:char2
+endfunction
+
+"
+" repeatable
+"
+function! s:repeatable(expect) abort
+  if empty(s:state)
+    return v:false
+  endif
+  if empty(get(s:state, 'char', v:null))
+    return v:false
+  endif
+  return s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == mode(1)
+endfunction
+
+"
+" reserve_reset
+"
+function! s:reserve_reset() abort
+  augroup eft
+    autocmd!
+  augroup END
+
+  let l:ctx = {}
+  function! l:ctx.callback() abort
+    augroup eft
+      autocmd!
+      autocmd BufEnter,InsertEnter,CursorMoved <buffer> ++once call eft#clear()
+    augroup END
+  endfunction
+  call timer_start(0, { -> l:ctx.callback() })
+endfunction
+
+"
+" is_operator_pending
+"
+function! s:is_operator_pending() abort
+  return index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
+endfunction
+
+"
+" getchar
+"
+function! s:getchar() abort
+  let l:char = nr2char(getchar())
+  redraw
+  if l:char =~# '[[:print:][:blank:]]'
+    return l:char
+  endif
+  return ''
 endfunction
 

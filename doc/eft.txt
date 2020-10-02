@@ -32,12 +32,57 @@ You can use your favorite plugin manager.
 ==============================================================================
 VARIABLE                                                        *eft-variable*
 
+*g:eft_ignorecase*
+
+  Specify enable or disable ignorecase matching.
+
+
+*g:eft_highlight*
+
+  Specify highlight settings.
 >
-  let g:eft_ignorecase = v:false
+    let g:eft_highlight = {
+    \   '1': {
+    \     'highlight': 'EftChar',
+    \     'allow_space': v:true,
+    \     'allow_operator': v:true,
+    \   },
+    \   '2': {
+    \     'highlight': 'EftSubChar',
+    \     'allow_space': v:false,
+    \     'allow_operator': v:false,
+    \   },
+    \   'n': {
+    \     'highlight': 'EftSubChar',
+    \     'allow_space': v:false,
+    \     'allow_operator': v:false,
+    \   }
+    \ }
+
+    " if you want to disable highlights.
+    let g:eft_highlight = {}
 <
-    Enable ignorecase matching for input char.
 
+  NOTE: You must set highlight group that has prefix `Eft`.
 
+*g:eft_index_function*
+
+  The index function can be customized as follows.
+>
+    let g:eft_index_function = {
+    \   'head': function('eft#index#head'),
+    \   'tail': function('eft#index#tail'),
+    \   'camel': function('eft#index#camel'),
+    \   'space': function('eft#index#space'),
+    \   'symbol': function('eft#index#symbol'),
+    \ }
+
+    or
+
+    let g:eft_index_function = {
+    \   'all': { -> v:true }
+    \ }
+<
 
 ==============================================================================
 MAPPING                                                          *eft-mapping*
@@ -76,6 +121,4 @@ MAPPING                                                          *eft-mapping*
   xmap T <Plug>(eft-T-repeatable)
   omap T <Plug>(eft-T-repeatable)
 <
-
-
 

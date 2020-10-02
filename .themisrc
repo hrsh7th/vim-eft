@@ -1,3 +1,18 @@
 call themis#option('recursive', 1)
 call themis#option('exclude', '\.vim$')
 
+let g:eft_assert = {}
+
+nnoremap <expr><Plug>(eft-assert) <SID>assert()
+onoremap <expr><Plug>(eft-assert) <SID>assert()
+xnoremap <expr><Plug>(eft-assert) <SID>assert()
+function! s:assert() abort
+  let l:keys = sort(keys(g:eft_assert))
+  if len(l:keys) > 0
+    let l:key = l:keys[0]
+    call g:eft_assert[l:key]()
+    unlet! g:eft_assert[l:key]
+  endif
+  return ''
+endfunction
+
