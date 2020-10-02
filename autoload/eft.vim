@@ -102,25 +102,11 @@ function! eft#index(text, index) abort
     return v:true
   endif
 
-  " ignore whitespace
-  if a:text[a:index] =~# '\s'
-    return v:false
-  endif
-
-  " symbols
-  if a:text[a:index] =~# '\A'
-    return v:true
-  endif
-
-  " boundaly
-  if a:text[a:index - 1] =~# '\A' && a:text[a:index] =~# '\a'
-    return v:true
-  endif
-
-  " camel
-  if a:text[a:index - 1] =~# '\U' && a:text[a:index] =~# '\u'
-    return v:true
-  endif
+  for [l:name, l:Index] in items(g:eft_index_function)
+    if l:Index(s:state, a:text, a:index)
+      return v:true
+    endif
+  endfor
 
   return v:false
 endfunction

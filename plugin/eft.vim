@@ -5,25 +5,31 @@ let g:loaded_eft = v:true
 
 let g:eft_highlight = get(g:, 'eft_highlight', v:false)
 let g:eft_ignorecase = get(g:, 'eft_ignorecase', v:false)
+let g:eft_index_function = get(g:, 'eft_index_function', {
+\   'head': function('eft#index#head'),
+\   'tail': function('eft#index#tail'),
+\   'camel': function('eft#index#camel'),
+\   'symbol': function('eft#index#symbol'),
+\ })
 
 if !hlexists('EftChar')
   highlight! default EftChar
-  \ gui=bold,underline
-  \ guifg=Orange
-  \ guibg=NONE
-  \ cterm=bold,underline
-  \ ctermfg=Red
-  \ ctermbg=NONE
+  \   gui=bold,underline
+  \   guifg=Orange
+  \   guibg=NONE
+  \   cterm=bold,underline
+  \   ctermfg=Red
+  \   ctermbg=NONE
 endif
 
 if !hlexists('EftSubChar')
   highlight! default EftSubChar
-  \ gui=bold,underline
-  \ guifg=Gray
-  \ guibg=NONE
-  \ cterm=bold,underline
-  \ ctermfg=Gray
-  \ ctermbg=NONE
+  \   gui=bold,underline
+  \   guifg=Gray
+  \   guibg=NONE
+  \   cterm=bold,underline
+  \   ctermfg=Gray
+  \   ctermbg=NONE
 endif
 
 nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>

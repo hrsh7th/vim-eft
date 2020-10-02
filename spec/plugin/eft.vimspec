@@ -142,7 +142,7 @@ Describe eft
   Describe repeat
     It should repeat
       enew!
-      call setline(1, ['aaa aaa aaa aaa'])
+      call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
       call feedkeys("\<Plug>(eft-f-repeatable)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
@@ -150,14 +150,14 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       call feedkeys("d\<Plug>(eft-t-repeatable)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call s:expect(getline('.')).to_equal('aaa aaa aaa')
+      call s:expect(getline('.')).to_equal('abb abb abb')
     End
   End
 
   Describe ;
     It should repeat
       enew!
-      call setline(1, ['aaa aaa aaa aaa'])
+      call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
       call feedkeys("\<Plug>(eft-f)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 5])
@@ -165,7 +165,7 @@ Describe eft
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       call feedkeys("d\<Plug>(eft-t)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
-      call s:expect(getline('.')).to_equal('aaa aaa aaa')
+      call s:expect(getline('.')).to_equal('abb abb abb')
     End
   End
 
