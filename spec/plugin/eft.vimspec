@@ -203,6 +203,42 @@ Describe eft
     End
   End
 
+  Describe cancel
+    It should work in normal mode
+      let g:eft_assert = {}
+      function! g:eft_assert.step1() abort
+        call s:expect(mode()).to_equal('n')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+      endfunction
+      enew!
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      call feedkeys("<Plug>(eft-f)\<Esc>\<Plug>(eft-assert)", 'x')
+    End
+    It should work in visual mode
+      let g:eft_assert = {}
+      function! g:eft_assert.step1() abort
+        call s:expect(mode()).to_equal('v')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+      endfunction
+      enew!
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      call feedkeys("v<Plug>(eft-f)\<Esc>\<Plug>(eft-assert)", 'x')
+    End
+    It should work in operator-pending mode
+      let g:eft_assert = {}
+      function! g:eft_assert.step1() abort
+        call s:expect(mode()).to_equal('n')
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+      endfunction
+      enew!
+      call setline(1, ['abb abb abb abb'])
+      call cursor([1, 1])
+      call feedkeys("d<Plug>(eft-f)\<Esc>\<Plug>(eft-assert)", 'x')
+    End
+  End
+
   Describe repeatable
     It should repeat for normal mode
       enew!
