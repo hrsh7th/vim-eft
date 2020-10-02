@@ -4,7 +4,20 @@ endif
 let g:loaded_eft = v:true
 
 let g:eft_ignorecase = get(g:, 'eft_ignorecase', v:false)
-let g:eft_highlight = get(g:, 'eft_highlight', v:false)
+
+let g:eft_highlight = get(g:, 'eft_highlight', {
+\   '1': {
+\     'highlight': 'EftChar',
+\     'allow_space': v:true,
+\     'allow_operator_pending': v:true,
+\   },
+\   '2': {
+\     'highlight': 'EftSubChar',
+\     'allow_space': v:false,
+\     'allow_operator_pending': v:false,
+\   }
+\ })
+
 let g:eft_index_function = get(g:, 'eft_index_function', {
 \   'head': function('eft#index#head'),
 \   'tail': function('eft#index#tail'),
@@ -15,20 +28,20 @@ let g:eft_index_function = get(g:, 'eft_index_function', {
 
 if !hlexists('EftChar')
   highlight! default EftChar
-  \   gui=bold,underline
+  \   gui=bold
   \   guifg=Orange
   \   guibg=NONE
-  \   cterm=bold,underline
+  \   cterm=bold
   \   ctermfg=Red
   \   ctermbg=NONE
 endif
 
 if !hlexists('EftSubChar')
   highlight! default EftSubChar
-  \   gui=bold,underline
+  \   gui=bold
   \   guifg=Gray
   \   guibg=NONE
-  \   cterm=bold,underline
+  \   cterm=bold
   \   ctermfg=Gray
   \   ctermbg=NONE
 endif

@@ -55,30 +55,31 @@ endfunction
 " NOTE: public for test.
 "
 function! eft#highlight(line, indices, is_operator_pending) abort
-  if !g:eft_highlight
+  if empty(g:eft_highlight)
     return { -> {} }
   endif
 
   let l:chars = {}
-  let l:main = []
-  let l:sub = []
+  let l:highs = []
 
   for l:i in a:indices
     if s:index(a:line, l:i)
       let l:char = a:line[l:i]
-      if !get(l:chars, l:char, v:false)
-        let l:chars[l:char] = v:true
-        let l:main += [l:i]
-      elseif l:char !=# ' ' && !a:is_operator_pending " don't highlight blank sub chars or in operator-pending mode.
-        let l:sub += [l:i]
+      let l:chars[l:char] = get(l:chars, l:char, 0) + 1
+      let l:config = get(g:eft_highlight, l:chars[l:char], get(g:eft_highlight, 'n', v:null))
+
+      let l:ok = v:true
+      let l:ok = l:ok && l:config isnot# v:null
+      let l:ok = l:ok && (!get(l:config, 'allow_space', v:false) || l:char !~# '[:blank:]')
+      let l:ok = l:ok && (!get(l:config, 'allow_operator', v:false) || !s:is_operator_pending())
+      if l:ok
+        let l:highs += [[l:config.highlight, l:i + 1]]
       endif
     endif
   endfor
 
-  let l:ids = []
-  let l:ids += map(l:main, 'matchaddpos("EftChar", [[line("."), v:val + 1]])')
-  let l:ids += map(l:sub, 'matchaddpos("EftSubChar", [[line("."), v:val + 1]])')
-  redraw!
+  let l:ids = map(l:highs, 'matchaddpos(v:val[0], [[line("."), v:val[1]]])')
+  redraw
   return { -> map(l:ids, 'matchdelete(v:val)') }
 endfunction
 
@@ -210,11 +211,7 @@ endfunction
 " getchar
 "
 function! s:getchar() abort
-  if get(g:, 'eft_test_mode', v:false)
-    let l:char = input('')
-  else
-    let l:char = nr2char(getchar())
-  endif
+  let l:char = nr2char(getchar())
   redraw
   if l:char =~# '[[:print:][:blank:]]'
     return l:char

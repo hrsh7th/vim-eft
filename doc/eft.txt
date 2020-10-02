@@ -39,13 +39,31 @@ VARIABLE                                                        *eft-variable*
 
 *g:eft_highlight*
 
-  Specify enable or disable highlight feature.
+  Specify highlight settings.
+>
+    let g:eft_highlight = {
+    \   '1': {
+    \     'highlight': 'EftChar',
+    \     'allow_space': v:false,
+    \     'allow_operator': v:true,
+    \   },
+    \   '2': {
+    \     'highlight': 'EftSubChar',
+    \     'allow_space': v:false,
+    \     'allow_operator': v:false,
+    \   },
+    \   'n': {
+    \     'highlight': 'EftSubChar',
+    \     'allow_space': v:false,
+    \     'allow_operator': v:false,
+    \   }
+    \ }
 
-  You can customize following two highlight groups.
+    " if you want to disable highlights.
+    let g:eft_highlight = {}
+<
 
-  1. `EftChar`
-  2. `EftSubChar`
-
+  NOTE: You must set highlight group that has prefix `Eft`.
 
 *g:eft_index_function*
 
