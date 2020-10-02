@@ -10,10 +10,10 @@ Describe eft
     It should work as native f
       for l:motion in ['fh', "\<Plug>(eft-f)h"]
         enew!
-        call setline(1, ['abcdefg hijklmn'])
+        call setline(1, ['あいうえお hijklmn'])
         call cursor([1, 1])
         call feedkeys(l:motion, 'x')
-        call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 17])
       endfor
     End
     It should work as native f in visual-mode
@@ -23,7 +23,7 @@ Describe eft
           call s:expect(mode()).to_equal('v')
         endfunction
         enew!
-        call setline(1, ['abcdefg hijklmn'])
+        call setline(1, ['あいうえお hijklmn'])
         call cursor([1, 1])
         call feedkeys(l:motion, 'x')
       endfor
@@ -32,10 +32,10 @@ Describe eft
     It should work as native t
       for l:motion in ['th', "\<Plug>(eft-t)h"]
         enew!
-        call setline(1, ['abcdefg hijklmn'])
+        call setline(1, ['あいうえお hijklmn'])
         call cursor([1, 1])
         call feedkeys(l:motion, 'x')
-        call s:expect(getpos('.')[1 : 2]).to_equal([1, 8])
+        call s:expect(getpos('.')[1 : 2]).to_equal([1, 16])
       endfor
     End
 
@@ -204,7 +204,7 @@ Describe eft
   End
 
   Describe repeatable
-    It should repeat
+    It should repeat for normal mode
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
@@ -215,6 +215,18 @@ Describe eft
       call feedkeys("d\<Plug>(eft-t-repeatable)a", 'x')
       call s:expect(getpos('.')[1 : 2]).to_equal([1, 9])
       call s:expect(getline('.')).to_equal('abb abb abb')
+    End
+
+    It should repeat for operator-pending mode
+      enew!
+      call setline(1, ['abb'])
+      call cursor([1, 1])
+      call feedkeys("d\<Plug>(eft-t-repeatable)a", 'x')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+      call feedkeys(".", 'nx')
+      call s:expect(getpos('.')[1 : 2]).to_equal([1, 1])
+      call feedkeys(".", 'nx')
+      call s:expect(getline('.')).to_equal('abb')
     End
   End
 

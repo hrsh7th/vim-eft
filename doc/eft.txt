@@ -28,7 +28,6 @@ You can use your favorite plugin manager.
 <
 
 
-
 ==============================================================================
 VARIABLE                                                        *eft-variable*
 
@@ -64,6 +63,7 @@ VARIABLE                                                        *eft-variable*
 <
 
   NOTE: You must set highlight group that has prefix `Eft`.
+
 
 *g:eft_index_function*
 

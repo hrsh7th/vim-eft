@@ -33,7 +33,7 @@ function! eft#forward(till, repeat) abort
   let s:state.dir = 'forward'
   let s:state.mode = mode(1)
   let s:state.till = a:till
-  call s:goto(l:repeat)
+  call eft#goto(l:repeat)
   return ''
 endfunction
 
@@ -45,12 +45,46 @@ function! eft#backward(till, repeat) abort
   let s:state.dir = 'backward'
   let s:state.mode = mode(1)
   let s:state.till = a:till
-  call s:goto(l:repeat)
+  call eft#goto(l:repeat)
   return ''
 endfunction
 
 "
-" highlight
+" eft#goto
+"
+" NOTE: publis for mapping
+"
+function! eft#goto(repeat) abort
+  let l:line = getline('.')
+  let l:indices = s:state.dir ==# 'forward'
+  \   ? range(col('.'), col('$') - 1)
+  \   : range(col('.') - 2, 0, -1)
+
+  if !a:repeat
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, s:is_operator_pending())
+    let s:state.char = s:getchar()
+    call l:Clear_highlight()
+  endif
+
+  if empty(s:state.char)
+    return eft#clear()
+  endif
+
+  call s:reserve_reset()
+
+  let l:col = s:compute_col(l:line, l:indices, s:state.char)
+  if l:col != -1
+    if s:state.dir ==# 'forward' && s:state.till
+      let l:col = l:col - 1
+    elseif s:state.dir ==# 'backward' && s:state.till
+      let l:col = l:col + 1
+    endif
+    call s:motion(l:col)
+  endif
+endfunction
+
+"
+" eft#highlight
 "
 " NOTE: public for test.
 "
@@ -87,38 +121,6 @@ function! eft#highlight(line, indices, is_operator_pending) abort
 endfunction
 
 "
-" goto
-"
-function! s:goto(repeat) abort
-  let l:line = getline('.')
-  let l:indices = s:state.dir ==# 'forward'
-  \   ? range(col('.'), col('$') - 1)
-  \   : range(col('.') - 2, 0, -1)
-
-  if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, s:is_operator_pending())
-    let s:state.char = s:getchar()
-    call l:Clear_highlight()
-  endif
-
-  if empty(s:state.char)
-    return eft#clear()
-  endif
-
-  call s:reserve_reset()
-
-  let l:offset = s:compute_offset(l:line, l:indices, s:state.char)
-  if l:offset != -1
-    if s:state.dir ==# 'forward' && s:state.till
-      let l:offset = l:offset - 1
-    elseif s:state.dir ==# 'backward' && s:state.till
-      let l:offset = l:offset + 1
-    endif
-    call s:motion(l:offset + 1)
-  endif
-endfunction
-
-"
 " index
 "
 function! s:index(text, index) abort
@@ -144,19 +146,19 @@ function! s:motion(col) abort
   augroup END
 
   if s:is_operator_pending()
-    call feedkeys(printf('v%s|', a:col), 'n')
+    execute printf('normal! v%s|', a:col)
   else
     call feedkeys(printf('%s|', a:col), 'n')
   endif
 endfunction
 
 "
-" compute_offset
+" compute_col
 "
-function! s:compute_offset(line, indices, char) abort
+function! s:compute_col(line, indices, char) abort
   for l:i in a:indices
     if l:i != 0 && s:index(a:line, l:i) && s:match(a:line[l:i], a:char)
-      return l:i
+      return strdisplaywidth(a:line[0 : l:i])
     endif
   endfor
   return -1
