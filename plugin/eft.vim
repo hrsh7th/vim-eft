@@ -26,7 +26,12 @@ let g:eft_index_function = get(g:, 'eft_index_function', {
 \   'symbol': function('eft#index#symbol'),
 \ })
 
-if !hlexists('EftChar')
+augroup eft
+  autocmd!
+  autocmd ColorScheme * call s:highlight()
+augroup END
+
+function! s:highlight() abort
   highlight! default EftChar
   \   gui=bold,underline
   \   guifg=Orange
@@ -34,9 +39,7 @@ if !hlexists('EftChar')
   \   cterm=bold,underline
   \   ctermfg=Red
   \   ctermbg=NONE
-endif
 
-if !hlexists('EftSubChar')
   highlight! default EftSubChar
   \   gui=bold,underline
   \   guifg=Gray
@@ -44,7 +47,8 @@ if !hlexists('EftSubChar')
   \   cterm=bold,underline
   \   ctermfg=Gray
   \   ctermbg=NONE
-endif
+endfunction
+call s:highlight()
 
 nnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
 xnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
