@@ -53,10 +53,10 @@ let g:eft_highlight = {
 \ }
 ```
 
-## Change character detection
+## character matching
 
 ```viml
-" you can pick your favorite strategies.
+" You can pick your favorite strategies.
 let g:eft_index_function = {
 \   'head': function('eft#index#head'),
 \   'tail': function('eft#index#tail'),
@@ -65,7 +65,7 @@ let g:eft_index_function = {
 \   'symbol': function('eft#index#symbol'),
 \ }
 
-" you can use the below function like native `f`
+" You can use the below function like native `f`
 let g:eft_index_function = {
 \   'all': { -> v:true },
 \ }
@@ -74,3 +74,6 @@ let g:eft_index_function = {
 ## DEMO
 
 <img src="https://user-images.githubusercontent.com/629908/94926175-525c1180-04fb-11eb-9080-64ec8c629464.gif" width="480" alt="Usage" />
+
+NOTE: This demo uses `Ff`, `fm` `fc` with this plugin's default configuration.
+
