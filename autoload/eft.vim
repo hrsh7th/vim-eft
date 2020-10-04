@@ -53,16 +53,13 @@ endfunction
 " NOTE: publis for mapping
 "
 function! s:goto(repeat) abort
-  echomsg string({
-  \   'repeat': a:repeat,
-  \   'manual': g:_eft_internal_manual,
-  \ })
   let g:_eft_internal_manual = v:false
 
   let l:line = getline('.')
+  let l:col = s:is_visual() ? col("'>") : col('.')
   let l:indices = s:state.dir ==# 'forward'
-  \   ? range(col('.'), col('$') - 1)
-  \   : range(col('.') - 2, 0, -1)
+  \   ? range(l:col, col('$') - 1)
+  \   : range(l:col - 2, 0, -1)
 
   if !a:repeat
     let l:Clear_highlight = eft#highlight(l:line, l:indices, s:is_operator_pending())
@@ -79,9 +76,12 @@ function! s:goto(repeat) abort
       elseif s:state.dir ==# 'backward' && s:state.till
         let l:col = l:col + 1
       endif
-      call s:motion(l:col)
+      return s:motion(l:col)
     endif
   end
+  if s:is_visual()
+    normal! gv
+  endif
 endfunction
 
 "
