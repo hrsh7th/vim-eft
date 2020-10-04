@@ -56,7 +56,7 @@ function! s:goto(repeat) abort
   let g:_eft_internal_manual = v:false
 
   let l:line = getline('.')
-  let l:col = s:is_visual() ? col("'>") : col('.')
+  let l:col = s:is_visual() ? col("'>") : col('.') " In visual-mode, does not returns valid `col('.')` when ; repeat.
   let l:indices = s:state.dir ==# 'forward'
   \   ? range(l:col, col('$') - 1)
   \   : range(l:col - 2, 0, -1)
@@ -79,7 +79,8 @@ function! s:goto(repeat) abort
       return s:motion(l:col)
     endif
   end
-  if s:is_visual()
+
+  if s:is_visual() " should restore visual-mode for mapping (`:<C-u>...<CR>`).
     normal! gv
   endif
 endfunction
