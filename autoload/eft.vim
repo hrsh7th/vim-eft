@@ -62,7 +62,7 @@ function! s:goto(repeat) abort
   \   : range(l:col - 2, 0, -1)
 
   if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, s:is_operator_pending())
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, s:is_operator_pending())
     let s:state.char = s:getchar()
     call l:Clear_highlight()
   endif
@@ -90,7 +90,7 @@ endfunction
 "
 " NOTE: public for test.
 "
-function! eft#highlight(line, indices, is_operator_pending) abort
+function! eft#highlight(line, indices, count, is_operator_pending) abort
   if empty(g:eft_highlight)
     return { -> {} }
   endif
@@ -106,7 +106,7 @@ function! eft#highlight(line, indices, is_operator_pending) abort
       endif
       let l:chars[l:char] = l:chars[l:char] + 1
 
-      let l:count = (l:chars[l:char] - v:count1) + 1
+      let l:count = (l:chars[l:char] - a:count) + 1
       if l:count < 0
         continue
       endif 
