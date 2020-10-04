@@ -16,35 +16,35 @@ endfunction
 function! eft#repeat() abort
   if !empty(s:state)
     if s:state.dir ==# 'forward'
-      call eft#forward(s:state.till, v:true)
+      call eft#forward(s:state.mode, s:state.till, v:true)
     else
-      call eft#backward(s:state.till, v:true)
+      call eft#backward(s:state.mode, s:state.till, v:true)
     endif
   else
-    call feedkeys(';', 'n')
+    normal! ;
   endif
 endfunction
 
 "
 " eft#forward
 "
-function! eft#forward(till, repeat) abort
-  let l:repeat = a:repeat && s:repeatable({ 'dir': 'forward', 'till': a:till })
+function! eft#forward(mode, till, repeat) abort
+  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({ 'dir': 'forward', 'till': a:till, 'mode': a:mode })
   let s:state.dir = 'forward'
-  let s:state.mode = mode(1)
+  let s:state.mode = a:mode
   let s:state.till = a:till
-  return eft#goto(l:repeat)
+  return s:goto(l:repeat)
 endfunction
 
 "
 " eft#backward
 "
-function! eft#backward(till, repeat) abort
-  let l:repeat = a:repeat && s:repeatable({ 'dir': 'backward', 'till': a:till })
+function! eft#backward(mode, till, repeat) abort
+  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({ 'dir': 'backward', 'till': a:till, 'mode': a:mode })
   let s:state.dir = 'backward'
-  let s:state.mode = mode(1)
+  let s:state.mode = a:mode
   let s:state.till = a:till
-  return eft#goto(l:repeat)
+  return s:goto(l:repeat)
 endfunction
 
 "
@@ -52,7 +52,13 @@ endfunction
 "
 " NOTE: publis for mapping
 "
-function! eft#goto(repeat) abort
+function! s:goto(repeat) abort
+  echomsg string({
+  \   'repeat': a:repeat,
+  \   'manual': g:_eft_internal_manual,
+  \ })
+  let g:_eft_internal_manual = v:false
+
   let l:line = getline('.')
   let l:indices = s:state.dir ==# 'forward'
   \   ? range(col('.'), col('$') - 1)
@@ -74,10 +80,8 @@ function! eft#goto(repeat) abort
         let l:col = l:col + 1
       endif
       call s:motion(l:col)
-      return ''
     endif
   end
-  return s:is_operator_pending() ? "\<Esc>" : ''
 endfunction
 
 "
@@ -100,7 +104,13 @@ function! eft#highlight(line, indices, is_operator_pending) abort
         let l:chars[l:char] = 0
       endif
       let l:chars[l:char] = l:chars[l:char] + 1
-      let l:config = get(g:eft_highlight, l:chars[l:char], get(g:eft_highlight, 'n', v:null))
+
+      let l:count = (l:chars[l:char] - v:count1) + 1
+      if l:count < 0
+        continue
+      endif 
+
+      let l:config = get(g:eft_highlight, l:count, get(g:eft_highlight, 'n', v:null))
 
       let l:ok = v:true
       let l:ok = l:ok && l:config isnot# v:null
@@ -144,8 +154,10 @@ function! s:motion(col) abort
 
   if s:is_operator_pending()
     execute printf('normal! v%s|', a:col)
+  elseif s:is_visual()
+    execute printf('normal! gv%s|', a:col)
   else
-    call feedkeys(printf('%s|', a:col), 'n')
+    execute printf('normal! %s|', a:col)
   endif
 endfunction
 
@@ -153,9 +165,13 @@ endfunction
 " compute_col
 "
 function! s:compute_col(line, indices, char) abort
+  let l:count = v:count1
   for l:i in a:indices
     if l:i != 0 && s:index(a:line, l:i) && s:match(a:line[l:i], a:char)
-      return strdisplaywidth(a:line[0 : l:i])
+      let l:count -= 1
+      if l:count == 0
+        return strdisplaywidth(a:line[0 : l:i])
+      endif
     endif
   endfor
   return -1
@@ -181,7 +197,7 @@ function! s:repeatable(expect) abort
   if empty(get(s:state, 'char', v:null))
     return v:false
   endif
-  return s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == mode(1)
+  return s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == a:expect.mode
 endfunction
 
 "
@@ -206,7 +222,14 @@ endfunction
 " is_operator_pending
 "
 function! s:is_operator_pending() abort
-  return index(['no', 'nov', 'noV', "no\<C-v>"], mode(1)) >= 0
+  return index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0
+endfunction
+
+"
+" is_visual
+"
+function! s:is_visual() abort
+  return index(['v', 'V', "\<C-v>"], s:state.mode) >= 0
 endfunction
 
 "
