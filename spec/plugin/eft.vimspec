@@ -171,7 +171,7 @@ Describe eft
       let g:eft_highlight = {}
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
-      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), 1, v:false)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(0)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
       call l:Clear_highlight()
@@ -182,7 +182,7 @@ Describe eft
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
-      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:false)
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), 1, v:false)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(3) " 'a', 'b', ' '
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(2) " -2 for ignoring space.
       call l:Clear_highlight()
@@ -194,7 +194,7 @@ Describe eft
       enew!
       call setline(1, ['abb abb abb abb'])
       call cursor([1, 1])
-      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), v:true)
+      let l:Clear_highlight = eft#highlight(getline('.'), range(col('.') - 1, col('$') - 1), 1, v:true)
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftChar"')).to_have_length(3) " 'a', 'b', ' '
       call s:expect(filter(getmatches(), 'v:val.group ==# "EftSubChar"')).to_have_length(0)
       call l:Clear_highlight()

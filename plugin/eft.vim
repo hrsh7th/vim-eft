@@ -50,34 +50,44 @@ function! s:highlight() abort
 endfunction
 call s:highlight()
 
-nnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
-xnoremap <silent><expr> <Plug>(eft-repeat) eft#repeat()
+nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
+xnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
 
-nnoremap <silent><expr> <Plug>(eft-f) eft#forward(v:false, v:false)
-nnoremap <silent><expr> <Plug>(eft-t) eft#forward(v:true, v:false)
-xnoremap <silent><expr> <Plug>(eft-f) eft#forward(v:false, v:false)
-xnoremap <silent><expr> <Plug>(eft-t) eft#forward(v:true, v:false)
-onoremap <silent> <Plug>(eft-f) :<C-u>call eft#forward(v:false, v:false)<CR>
-onoremap <silent> <Plug>(eft-t) :<C-u>call eft#forward(v:true, v:false)<CR>
+nnoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+nnoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+xnoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+xnoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+onoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
 
-nnoremap <silent><expr> <Plug>(eft-F) eft#backward(v:false, v:false)
-nnoremap <silent><expr> <Plug>(eft-T) eft#backward(v:true, v:false)
-xnoremap <silent><expr> <Plug>(eft-F) eft#backward(v:false, v:false)
-xnoremap <silent><expr> <Plug>(eft-T) eft#backward(v:true, v:false)
-onoremap <silent> <Plug>(eft-F) :<C-u>call eft#backward(v:false, v:false)<CR>
-onoremap <silent> <Plug>(eft-T) :<C-u>call eft#backward(v:true, v:false)<CR>
+nnoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+nnoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
+xnoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+xnoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
+onoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
 
-nnoremap <silent><expr> <Plug>(eft-f-repeatable) eft#forward(v:false, v:true)
-nnoremap <silent><expr> <Plug>(eft-t-repeatable) eft#forward(v:true, v:true)
-xnoremap <silent><expr> <Plug>(eft-f-repeatable) eft#forward(v:false, v:true)
-xnoremap <silent><expr> <Plug>(eft-t-repeatable) eft#forward(v:true, v:true)
-onoremap <silent> <Plug>(eft-f-repeatable) :<C-u>call eft#forward(v:false, v:true)<CR>
-onoremap <silent> <Plug>(eft-t-repeatable) :<C-u>call eft#forward(v:true, v:true)<CR>
+nnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+nnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+xnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+xnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+onoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
 
-nnoremap <silent><expr> <Plug>(eft-F-repeatable) eft#backward(v:false, v:true)
-nnoremap <silent><expr> <Plug>(eft-T-repeatable) eft#backward(v:true, v:true)
-xnoremap <silent><expr> <Plug>(eft-F-repeatable) eft#backward(v:false, v:true)
-xnoremap <silent><expr> <Plug>(eft-T-repeatable) eft#backward(v:true, v:true)
-onoremap <silent> <Plug>(eft-F-repeatable) :<C-u>call eft#backward(v:false, v:true)<CR>
-onoremap <silent> <Plug>(eft-T-repeatable) :<C-u>call eft#backward(v:true, v:true)<CR>
+nnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+nnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
+xnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+xnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+onoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
+
+function! s:map(dir, till, repeat) abort
+  let g:_eft_internal_manual = v:true
+  return printf(":\<C-u>call eft#%s('%s', %s, %s)\<CR>",
+  \   a:dir,
+  \   mode(1),
+  \   a:till ? 'v:true' : 'v:false',
+  \   a:repeat ? 'v:true' : 'v:false'
+  \ )
+endfunction
 
