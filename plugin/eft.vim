@@ -71,15 +71,17 @@ nnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:
 nnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
 xnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
 xnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
-onoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
-onoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:false)
 
 nnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
 nnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
 xnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
 xnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
-onoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
-onoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
+onoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:false)
+onoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:false)
+
+" TODO: `onoremap eft-*-repeatable ...` does not needed so we should mark as deprecated.
 
 function! s:map(dir, till, repeat) abort
   let g:_eft_internal_manual = v:true

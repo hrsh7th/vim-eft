@@ -3,11 +3,13 @@ let s:state = {}
 "
 " eft#clear
 "
-function! eft#clear() abort
+function! eft#clear(...) abort
   augroup eft
     autocmd!
   augroup END
-  let s:state = {}
+  if !s:is_operator_pending() || get(a:000, 0, v:false)
+    let s:state = {}
+  endif
 endfunction
 
 "
@@ -198,7 +200,7 @@ function! s:repeatable(expect) abort
   if empty(get(s:state, 'char', v:null))
     return v:false
   endif
-  return s:state.dir == a:expect.dir && s:state.till == a:expect.till && s:state.mode == a:expect.mode
+  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode
 endfunction
 
 "
@@ -223,14 +225,14 @@ endfunction
 " is_operator_pending
 "
 function! s:is_operator_pending() abort
-  return index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0
+  return has_key(s:state, 'mode') && index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0
 endfunction
 
 "
 " is_visual
 "
 function! s:is_visual() abort
-  return index(['v', 'V', "\<C-v>"], s:state.mode) >= 0
+  return has_key(s:state, 'mode') && index(['v', 'V', "\<C-v>"], s:state.mode) >= 0
 endfunction
 
 "

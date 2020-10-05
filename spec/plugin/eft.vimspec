@@ -3,7 +3,7 @@ let s:expect = themis#helper('expect')
 Describe eft
 
   After each
-    call eft#clear()
+    call eft#clear(v:true)
   End
 
   Describe same as native behavior
