@@ -31,7 +31,12 @@ endfunction
 " eft#forward
 "
 function! eft#forward(mode, till, repeat) abort
-  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({ 'dir': 'forward', 'till': a:till, 'mode': a:mode })
+  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
+  \   'dir': 'forward',
+  \   'till': a:till,
+  \   'mode': a:mode,
+  \   'cursor': getpos('.'),
+  \ })
   let s:state.dir = 'forward'
   let s:state.mode = a:mode
   let s:state.till = a:till
@@ -42,7 +47,12 @@ endfunction
 " eft#backward
 "
 function! eft#backward(mode, till, repeat) abort
-  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({ 'dir': 'backward', 'till': a:till, 'mode': a:mode })
+  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
+  \   'dir': 'backward',
+  \   'till': a:till,
+  \   'mode': a:mode,
+  \   'cursor': getpos('.'),
+  \ })
   let s:state.dir = 'backward'
   let s:state.mode = a:mode
   let s:state.till = a:till
@@ -70,7 +80,6 @@ function! s:goto(repeat) abort
   endif
 
   if !empty(s:state.char)
-    call s:reserve_reset()
     let l:col = s:compute_col(l:line, l:indices, s:state.char)
     if l:col != -1
       if s:state.dir ==# 'forward' && s:state.till
@@ -78,7 +87,7 @@ function! s:goto(repeat) abort
       elseif s:state.dir ==# 'backward' && s:state.till
         let l:col = l:col + 1
       endif
-      return s:motion(l:col)
+      call s:motion(l:col)
     endif
   end
 
@@ -162,6 +171,10 @@ function! s:motion(col) abort
   else
     execute printf('normal! %s|', a:col)
   endif
+
+  let s:state.cursor = getpos('.')
+
+  call s:reserve_reset()
 endfunction
 
 "
@@ -200,7 +213,7 @@ function! s:repeatable(expect) abort
   if empty(get(s:state, 'char', v:null))
     return v:false
   endif
-  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode
+  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode && get(s:state, 'cursor', []) == a:expect.cursor
 endfunction
 
 "
