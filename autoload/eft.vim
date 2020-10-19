@@ -68,7 +68,7 @@ function! s:goto(repeat) abort
   let g:_eft_internal_manual = v:false
 
   let l:line = getline('.')
-  let l:col = s:is_visual() ? col("'>") : col('.') " In visual-mode, does not returns valid `col('.')` when ; repeat.
+  let l:col = col('.') " In visual-mode, does not returns valid `col('.')` when ; repeat.
   let l:indices = s:state.dir ==# 'forward'
   \   ? range(l:col, col('$') - 1)
   \   : range(l:col - 2, 0, -1)
@@ -164,17 +164,19 @@ function! s:motion(col) abort
     autocmd!
   augroup END
 
-  if s:is_operator_pending()
-    execute printf('normal! v%s|', a:col)
-  elseif s:is_visual()
-    execute printf('normal! gv%s|', a:col)
-  else
-    execute printf('normal! %s|', a:col)
-  endif
-
-  let s:state.cursor = getpos('.')
-
-  call s:reserve_reset()
+  let l:ctx = {}
+  function! l:ctx.callback(col) abort
+    if s:is_operator_pending()
+      execute printf('normal! v%s|', a:col)
+    elseif s:is_visual()
+      execute printf('normal! gv%s|', a:col)
+    else
+      execute printf('normal! %s|', a:col)
+    endif
+    let s:state.cursor = getpos('.')
+    call s:reserve_reset()
+  endfunction
+  call timer_start(0, { -> l:ctx.callback(a:col) })
 endfunction
 
 "
