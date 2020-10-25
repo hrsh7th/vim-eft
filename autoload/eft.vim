@@ -164,19 +164,21 @@ function! s:motion(col) abort
     autocmd!
   augroup END
 
-  let l:ctx = {}
-  function! l:ctx.callback(col) abort
-    if s:is_operator_pending()
-      execute printf('normal! v%s|', a:col)
-    elseif s:is_visual()
-      execute printf('normal! gv%s|', a:col)
-    else
-      execute printf('normal! %s|', a:col)
-    endif
-    let s:state.cursor = getpos('.')
-    call s:reserve_reset()
-  endfunction
-  call timer_start(0, { -> l:ctx.callback(a:col) })
+  if s:is_operator_pending()
+    execute printf('normal! v%s|', a:col)
+  else
+    let l:ctx = {}
+    function! l:ctx.callback(col) abort
+      if s:is_visual()
+        execute printf('normal! gv%s|', a:col)
+      else
+        execute printf('normal! %s|', a:col)
+      endif
+      let s:state.cursor = getpos('.')
+      call s:reserve_reset()
+    endfunction
+    call timer_start(0, { -> l:ctx.callback(a:col) })
+  endif
 endfunction
 
 "
