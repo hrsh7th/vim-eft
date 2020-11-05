@@ -7,7 +7,7 @@ function! eft#clear(...) abort
   augroup eft
     autocmd!
   augroup END
-  if !s:is_operator_pending() || get(a:000, 0, v:false)
+  if !s:state.mode ==# 'operator-pending' || get(a:000, 0, v:false)
     let s:state = {}
   endif
 endfunction
@@ -74,7 +74,7 @@ function! s:goto(repeat) abort
   \   : range(l:col - 2, 0, -1)
 
   if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, s:is_operator_pending())
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, s:state.mode ==# 'operator-pending')
     let s:state.char = s:getchar()
     call l:Clear_highlight()
   endif
@@ -89,11 +89,11 @@ function! s:goto(repeat) abort
       endif
       call s:motion(l:col)
     endif
+  else
+    if s:state.mode ==# 'visual' " should restore visual-mode for mapping (`:<C-u>...<CR>`).
+      normal! gv
+    endif
   end
-
-  if s:is_visual() " should restore visual-mode for mapping (`:<C-u>...<CR>`).
-    normal! gv
-  endif
 endfunction
 
 "
@@ -164,12 +164,12 @@ function! s:motion(col) abort
     autocmd!
   augroup END
 
-  if s:is_operator_pending()
+  if s:state.mode ==# 'operator-pending'
     execute printf('normal! v%s|', a:col)
   else
     let l:ctx = {}
     function! l:ctx.callback(col) abort
-      if s:is_visual()
+      if s:state.mode ==# 'visual'
         execute printf('normal! gv%s|', a:col)
       else
         execute printf('normal! %s|', a:col)
@@ -236,20 +236,6 @@ function! s:reserve_reset() abort
     augroup END
   endfunction
   call timer_start(0, { -> l:ctx.callback() })
-endfunction
-
-"
-" is_operator_pending
-"
-function! s:is_operator_pending() abort
-  return has_key(s:state, 'mode') && index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0
-endfunction
-
-"
-" is_visual
-"
-function! s:is_visual() abort
-  return has_key(s:state, 'mode') && index(['v', 'V', "\<C-v>"], s:state.mode) >= 0
 endfunction
 
 "

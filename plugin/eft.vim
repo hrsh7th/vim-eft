@@ -87,9 +87,17 @@ function! s:map(dir, till, repeat) abort
   let g:_eft_internal_manual = v:true
   return printf(":\<C-u>call eft#%s('%s', %s, %s)\<CR>",
   \   a:dir,
-  \   mode(1),
+  \   s:mode(),
   \   a:till ? 'v:true' : 'v:false',
   \   a:repeat ? 'v:true' : 'v:false'
   \ )
 endfunction
 
+function! s:mode() abort
+  if index(['no', 'nov', 'noV', "no\<C-V>"], mode(1)) >= 0
+    return 'operator-pending'
+  elseif index(['v', 'V', "\<C-V>"], mode(1)) >= 0
+    return 'visual'
+  endif
+  return 'normal'
+endfunction
