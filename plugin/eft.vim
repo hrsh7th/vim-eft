@@ -85,7 +85,8 @@ onoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:
 
 function! s:map(dir, till, repeat) abort
   let g:_eft_internal_manual = v:true
-  return printf(":\<C-u>call eft#%s('%s', %s, %s)\<CR>",
+  return printf("%s:\<C-u>call eft#%s('%s', %s, %s, getcurpos())\<CR>",
+  \   s:mode() ==# 'visual' ? "\<Esc>" : '',
   \   a:dir,
   \   s:mode(),
   \   a:till ? 'v:true' : 'v:false',
@@ -101,3 +102,4 @@ function! s:mode() abort
   endif
   return 'normal'
 endfunction
+

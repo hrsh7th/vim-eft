@@ -18,9 +18,9 @@ endfunction
 function! eft#repeat() abort
   if !empty(s:state)
     if s:state.dir ==# 'forward'
-      call eft#forward(s:state.mode, s:state.till, v:true)
+      call eft#forward(s:state.mode, s:state.till, v:true, getcurpos())
     else
-      call eft#backward(s:state.mode, s:state.till, v:true)
+      call eft#backward(s:state.mode, s:state.till, v:true, getcurpos())
     endif
   else
     normal! ;
@@ -30,32 +30,34 @@ endfunction
 "
 " eft#forward
 "
-function! eft#forward(mode, till, repeat) abort
+function! eft#forward(mode, till, repeat, curpos) abort
   let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
   \   'dir': 'forward',
   \   'till': a:till,
   \   'mode': a:mode,
-  \   'cursor': getpos('.'),
+  \   'curpos': a:curpos,
   \ })
   let s:state.dir = 'forward'
   let s:state.mode = a:mode
   let s:state.till = a:till
+  let s:state.curpos = a:curpos
   return s:goto(l:repeat)
 endfunction
 
 "
 " eft#backward
 "
-function! eft#backward(mode, till, repeat) abort
+function! eft#backward(mode, till, repeat, curpos) abort
   let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
   \   'dir': 'backward',
   \   'till': a:till,
   \   'mode': a:mode,
-  \   'cursor': getpos('.'),
+  \   'curpos': a:curpos,
   \ })
   let s:state.dir = 'backward'
   let s:state.mode = a:mode
   let s:state.till = a:till
+  let s:state.curpos = a:curpos
   return s:goto(l:repeat)
 endfunction
 
@@ -67,10 +69,10 @@ endfunction
 function! s:goto(repeat) abort
   let g:_eft_internal_manual = v:false
 
-  let l:line = getline('.')
-  let l:col = col('.') " In visual-mode, does not returns valid `col('.')` when ; repeat.
+  let l:line = getline(s:state.curpos[1])
+  let l:col = s:state.curpos[2]
   let l:indices = s:state.dir ==# 'forward'
-  \   ? range(l:col, col('$') - 1)
+  \   ? range(l:col, strlen(l:line))
   \   : range(l:col - 2, 0, -1)
 
   if !a:repeat
@@ -166,6 +168,7 @@ function! s:motion(col) abort
 
   if s:state.mode ==# 'operator-pending'
     execute printf('normal! v%s|', a:col)
+    call s:reserve_reset()
   else
     let l:ctx = {}
     function! l:ctx.callback(col) abort
@@ -174,7 +177,7 @@ function! s:motion(col) abort
       else
         execute printf('normal! %s|', a:col)
       endif
-      let s:state.cursor = getpos('.')
+      let s:state.curpos = getcurpos()
       call s:reserve_reset()
     endfunction
     call timer_start(0, { -> l:ctx.callback(a:col) })
@@ -217,7 +220,7 @@ function! s:repeatable(expect) abort
   if empty(get(s:state, 'char', v:null))
     return v:false
   endif
-  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode && get(s:state, 'cursor', []) == a:expect.cursor
+  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode && get(s:state, 'curpos', []) == a:expect.curpos
 endfunction
 
 "
