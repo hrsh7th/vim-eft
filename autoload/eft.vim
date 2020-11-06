@@ -91,11 +91,11 @@ function! s:goto(repeat) abort
       endif
       call s:motion(l:col)
     endif
-  else
-    if s:state.mode ==# 'visual' " should restore visual-mode for mapping (`:<C-u>...<CR>`).
-      normal! gv
-    endif
   end
+
+  if s:state.mode ==# 'visual' " should restore visual-mode for mapping (`:<C-u>...<CR>`).
+    normal! gv
+  endif
 endfunction
 
 "
