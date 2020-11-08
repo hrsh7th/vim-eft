@@ -51,7 +51,7 @@ endfunction
 call s:highlight()
 
 nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
-xnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
+xnoremap <silent> <Plug>(eft-repeat) <Esc>:<C-u>call eft#repeat()<CR>
 
 nnoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
 nnoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
