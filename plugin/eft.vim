@@ -26,6 +26,8 @@ let g:eft_index_function = get(g:, 'eft_index_function', {
 \   'symbol': function('eft#index#symbol'),
 \ })
 
+let g:_eft_mapping = v:false
+
 augroup eft
   autocmd!
   autocmd ColorScheme * call s:highlight()
@@ -50,56 +52,46 @@ function! s:highlight() abort
 endfunction
 call s:highlight()
 
-nnoremap <silent> <Plug>(eft-repeat) :<C-u>call eft#repeat()<CR>
-xnoremap <silent> <Plug>(eft-repeat) <Esc>:<C-u>call eft#repeat()<CR>
+nnoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
+xnoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
+onoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
 
-nnoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
-nnoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
-xnoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
-xnoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
-onoremap <silent><expr> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
-onoremap <silent><expr> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+nnoremap <expr><silent> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+nnoremap <expr><silent> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+nnoremap <expr><silent> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+nnoremap <expr><silent> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
 
-nnoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
-nnoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
-xnoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
-xnoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
-onoremap <silent><expr> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
-onoremap <silent><expr> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
+xnoremap <expr><silent> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+xnoremap <expr><silent> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+xnoremap <expr><silent> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+xnoremap <expr><silent> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
 
-nnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
-nnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
-xnoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
-xnoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
-onoremap <silent><expr> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:false)
-onoremap <silent><expr> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:false)
+onoremap <expr><silent> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
+onoremap <expr><silent> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
+onoremap <expr><silent> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
+onoremap <expr><silent> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
 
-nnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
-nnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
-xnoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:true)
-xnoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:true)
-onoremap <silent><expr> <Plug>(eft-F-repeatable) <SID>map('backward', v:false, v:false)
-onoremap <silent><expr> <Plug>(eft-T-repeatable) <SID>map('backward', v:true, v:false)
+nnoremap <expr><silent> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+nnoremap <expr><silent> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+nnoremap <expr><silent> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+nnoremap <expr><silent> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
 
-" TODO: `onoremap eft-*-repeatable ...` does not needed so we should mark as deprecated.
+xnoremap <expr><silent> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+xnoremap <expr><silent> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+xnoremap <expr><silent> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+xnoremap <expr><silent> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
 
-function! s:map(dir, till, repeat) abort
-  let g:_eft_internal_manual = v:true
-  return printf("%s:\<C-u>call eft#%s('%s', %s, %s, getcurpos())\<CR>",
-  \   s:mode() ==# 'visual' ? "\<Esc>" : '',
-  \   a:dir,
-  \   s:mode(),
-  \   a:till ? 'v:true' : 'v:false',
-  \   a:repeat ? 'v:true' : 'v:false'
+onoremap <expr><silent> <Plug>(eft-f) <SID>map('forward', v:false, v:false)
+onoremap <expr><silent> <Plug>(eft-t) <SID>map('forward', v:true, v:false)
+onoremap <expr><silent> <Plug>(eft-F) <SID>map('backward', v:false, v:false)
+onoremap <expr><silent> <Plug>(eft-T) <SID>map('backward', v:true, v:false)
+
+function! s:map(dir, till, repeatable) abort
+  let g:_eft_mapping = v:true
+  return printf("\<Cmd>call eft#%s({ 'till': %s, 'repeatable': %s })\<CR>",
+  \ a:dir,
+  \ a:till ? 'v:true' : 'v:false',
+  \ a:repeatable ? 'v:true' : 'v:false'
   \ )
-endfunction
-
-function! s:mode() abort
-  if index(['no', 'nov', 'noV', "no\<C-V>"], mode(1)) >= 0
-    return 'operator-pending'
-  elseif index(['v', 'V', "\<C-V>"], mode(1)) >= 0
-    return 'visual'
-  endif
-  return 'normal'
 endfunction
 

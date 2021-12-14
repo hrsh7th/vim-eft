@@ -1,27 +1,15 @@
 let s:state = {}
 
-"
-" eft#clear
-"
-function! eft#clear(...) abort
-  augroup eft
-    autocmd!
-  augroup END
-  if !s:state.mode ==# 'operator-pending' || get(a:000, 0, v:false)
-    let s:state = {}
-  endif
-endfunction
+let s:Dir = {}
+let s:Dir.Next = 1
+let s:Dir.Prev = 2
 
 "
 " eft#repeat
 "
 function! eft#repeat() abort
-  if !empty(s:state)
-    if s:state.dir ==# 'forward'
-      call eft#forward(s:state.mode, s:state.till, v:true, getcurpos())
-    else
-      call eft#backward(s:state.mode, s:state.till, v:true, getcurpos())
-    endif
+  if !empty(s:state) && s:repeatable(s:state.dir, s:state.till, v:true)
+    call s:goto(v:true)
   else
     normal! ;
   endif
@@ -30,53 +18,51 @@ endfunction
 "
 " eft#forward
 "
-function! eft#forward(mode, till, repeat, curpos) abort
-  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
-  \   'dir': 'forward',
-  \   'till': a:till,
-  \   'mode': a:mode,
-  \   'curpos': a:curpos,
-  \ })
-  let s:state.dir = 'forward'
-  let s:state.mode = a:mode
-  let s:state.till = a:till
-  let s:state.curpos = a:curpos
-  return s:goto(l:repeat)
+function! eft#forward(args) abort
+  let l:repeat = s:repeatable(s:Dir.Next, a:args.till, a:args.repeatable)
+  let s:state.dir = s:Dir.Next
+  let s:state.mode = mode(1)
+  let s:state.till = a:args.till
+  let s:state.curpos = getcurpos()
+  call s:goto(l:repeat)
 endfunction
 
 "
 " eft#backward
 "
-function! eft#backward(mode, till, repeat, curpos) abort
-  let l:repeat = (a:repeat || !g:_eft_internal_manual) && s:repeatable({
-  \   'dir': 'backward',
-  \   'till': a:till,
-  \   'mode': a:mode,
-  \   'curpos': a:curpos,
-  \ })
-  let s:state.dir = 'backward'
-  let s:state.mode = a:mode
-  let s:state.till = a:till
-  let s:state.curpos = a:curpos
-  return s:goto(l:repeat)
+function! eft#backward(args) abort
+  let l:repeat = s:repeatable(s:Dir.Prev, a:args.till, a:args.repeatable)
+  let s:state.dir = s:Dir.Prev
+  let s:state.till = a:args.till
+  let s:state.mode = mode(1)
+  let s:state.curpos = getcurpos()
+  call s:goto(l:repeat)
 endfunction
 
 "
-" eft#goto
+" s:repeatable
 "
-" NOTE: publis for mapping
+function! s:repeatable(dir, till, repeatable) abort
+  let l:ok = a:repeatable
+  let l:ok = l:ok && get(s:state, 'dir', v:null) == a:dir
+  let l:ok = l:ok && get(s:state, 'till', v:null) == a:till
+  let l:ok = l:ok && get(s:state, 'mode', v:null) == mode(1)
+  let l:ok = l:ok && get(s:state, 'curpos', []) == getcurpos()
+  return l:ok || (!empty(s:state) && !g:_eft_mapping)
+endfunction
+
+"
+" s:goto
 "
 function! s:goto(repeat) abort
-  let g:_eft_internal_manual = v:false
+  let g:_eft_mapping = v:false
 
   let l:line = getline(s:state.curpos[1])
   let l:col = s:state.curpos[2]
-  let l:indices = s:state.dir ==# 'forward'
-  \   ? range(l:col, strlen(l:line))
-  \   : range(l:col - 2, 0, -1)
+  let l:indices = s:state.dir ==# s:Dir.Next ? range(l:col, strlen(l:line)) : range(l:col - 2, 0, -1)
 
   if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, s:state.mode ==# 'operator-pending')
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0)
     let s:state.char = s:getchar()
     call l:Clear_highlight()
   endif
@@ -84,24 +70,49 @@ function! s:goto(repeat) abort
   if !empty(s:state.char)
     let l:col = s:compute_col(l:line, l:indices, s:state.char)
     if l:col != -1
-      if s:state.dir ==# 'forward' && s:state.till
+      if s:state.dir ==# s:Dir.Next && s:state.till
         let l:col = l:col - 1
-      elseif s:state.dir ==# 'backward' && s:state.till
+      elseif s:state.dir ==# s:Dir.Prev && s:state.till
         let l:col = l:col + 1
       endif
-      call s:motion(l:col)
+      execute printf('normal! %s|', l:col)
+      call s:reserve_reset()
     endif
   end
+endfunction
 
-  if s:state.mode ==# 'visual' " should restore visual-mode for mapping (`:<C-u>...<CR>`).
-    normal! gv
+"
+" s:reserve_reset
+"
+function! s:reserve_reset() abort
+  augroup eft
+    autocmd!
+  augroup END
+  call feedkeys("\<Cmd>call eft#_reserve_reset()\<CR>", 'n')
+endfunction
+
+"
+" eft#_reserve_reset
+"
+function! eft#_reserve_reset() abort
+  let s:state.curpos = getcurpos()
+  augroup eft
+    autocmd!
+    autocmd CursorMoved <buffer> let s:state = {}
+  augroup END
+endfunction
+
+"
+" eft#_reset
+"
+function! eft#_reset() abort
+  if get(s:state, 'curpos', v:null) != getcurpos()
+    let s:state = {}
   endif
 endfunction
 
 "
 " eft#highlight
-"
-" NOTE: public for test.
 "
 function! eft#highlight(line, indices, count, is_operator_pending) abort
   if empty(g:eft_highlight)
@@ -159,32 +170,6 @@ function! s:index(text, index) abort
 endfunction
 
 "
-" motion
-"
-function! s:motion(col) abort
-  augroup eft
-    autocmd!
-  augroup END
-
-  if s:state.mode ==# 'operator-pending'
-    execute printf('normal! v%s|', a:col)
-    call s:reserve_reset()
-  else
-    let l:ctx = {}
-    function! l:ctx.callback(col) abort
-      if s:state.mode ==# 'visual'
-        execute printf('normal! gv%s|', a:col)
-      else
-        execute printf('normal! %s|', a:col)
-      endif
-      let s:state.curpos = getcurpos()
-      call s:reserve_reset()
-    endfunction
-    call timer_start(0, { -> l:ctx.callback(a:col) })
-  endif
-endfunction
-
-"
 " compute_col
 "
 function! s:compute_col(line, indices, char) abort
@@ -208,37 +193,6 @@ function! s:match(char1, char2) abort
     return a:char1 ==? a:char2
   endif
   return a:char1 ==# a:char2
-endfunction
-
-"
-" repeatable
-"
-function! s:repeatable(expect) abort
-  if empty(s:state)
-    return v:false
-  endif
-  if empty(get(s:state, 'char', v:null))
-    return v:false
-  endif
-  return s:state.dir ==# a:expect.dir && s:state.till == a:expect.till && s:state.mode ==# a:expect.mode && get(s:state, 'curpos', []) == a:expect.curpos
-endfunction
-
-"
-" reserve_reset
-"
-function! s:reserve_reset() abort
-  augroup eft
-    autocmd!
-  augroup END
-
-  let l:ctx = {}
-  function! l:ctx.callback() abort
-    augroup eft
-      autocmd!
-      autocmd BufEnter,InsertEnter,CursorMoved <buffer> ++once call eft#clear()
-    augroup END
-  endfunction
-  call timer_start(0, { -> l:ctx.callback() })
 endfunction
 
 "
