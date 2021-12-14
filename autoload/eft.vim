@@ -98,7 +98,7 @@ function! eft#_reserve_reset() abort
   let s:state.curpos = getcurpos()
   augroup eft
     autocmd!
-    autocmd CursorMoved <buffer> let s:state = {}
+    autocmd CursorMoved <buffer> call eft#_reset()
   augroup END
 endfunction
 
@@ -106,8 +106,10 @@ endfunction
 " eft#_reset
 "
 function! eft#_reset() abort
-  if get(s:state, 'curpos', v:null) != getcurpos()
-    let s:state = {}
+  if !empty(s:state)
+    if s:state.curpos != getcurpos() && index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) == -1
+      let s:state = {}
+    endif
   endif
 endfunction
 
