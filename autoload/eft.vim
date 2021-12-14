@@ -9,7 +9,7 @@ let s:Dir.Prev = 2
 "
 function! eft#repeat() abort
   if !empty(s:state) && s:repeatable(s:state.dir, s:state.till, v:true)
-    call s:goto(v:true)
+    call s:goto(v:true, s:state.dir, s:state.till)
   else
     normal! ;
   endif
@@ -20,11 +20,7 @@ endfunction
 "
 function! eft#forward(args) abort
   let l:repeat = s:repeatable(s:Dir.Next, a:args.till, a:args.repeatable)
-  let s:state.dir = s:Dir.Next
-  let s:state.mode = mode(1)
-  let s:state.till = a:args.till
-  let s:state.curpos = getcurpos()
-  call s:goto(l:repeat)
+  call s:goto(l:repeat, s:Dir.Next, a:args.till)
 endfunction
 
 "
@@ -32,18 +28,14 @@ endfunction
 "
 function! eft#backward(args) abort
   let l:repeat = s:repeatable(s:Dir.Prev, a:args.till, a:args.repeatable)
-  let s:state.dir = s:Dir.Prev
-  let s:state.till = a:args.till
-  let s:state.mode = mode(1)
-  let s:state.curpos = getcurpos()
-  call s:goto(l:repeat)
+  call s:goto(l:repeat, s:Dir.Prev, a:args.till)
 endfunction
 
 "
 " s:repeatable
 "
 function! s:repeatable(dir, till, repeatable) abort
-  let l:ok = a:repeatable
+  let l:ok = a:repeatable && !empty(s:state)
   let l:ok = l:ok && get(s:state, 'dir', v:null) == a:dir
   let l:ok = l:ok && get(s:state, 'till', v:null) == a:till
   let l:ok = l:ok && get(s:state, 'mode', v:null) == mode(1)
@@ -54,28 +46,37 @@ endfunction
 "
 " s:goto
 "
-function! s:goto(repeat) abort
+function! s:goto(repeat, dir, till) abort
   let g:_eft_mapping = v:false
 
-  let l:line = getline(s:state.curpos[1])
-  let l:col = s:state.curpos[2]
-  let l:indices = s:state.dir ==# s:Dir.Next ? range(l:col, strlen(l:line)) : range(l:col - 2, 0, -1)
+  let l:mode = mode(1)
+  let l:curpos = getcurpos()
+  let l:line = getline(l:curpos[1])
+  let l:col = l:curpos[2]
+  let l:indices = a:dir ==# s:Dir.Next ? range(l:col, strlen(l:line)) : range(l:col - 2, 0, -1)
 
+  let l:char = get(s:state, 'char', v:null)
   if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) >= 0)
-    let s:state.char = s:getchar()
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, index(['no', 'nov', 'noV', "no\<C-v>"], l:mode) >= 0)
+    let l:char = s:getchar()
     call l:Clear_highlight()
   endif
 
-  if !empty(s:state.char)
-    let l:col = s:compute_col(l:line, l:indices, s:state.char)
+  if !empty(l:char)
+    let l:col = s:compute_col(l:line, l:indices, l:char)
     if l:col != -1
-      if s:state.dir ==# s:Dir.Next && s:state.till
+      if a:dir ==# s:Dir.Next && a:till
         let l:col = l:col - 1
-      elseif s:state.dir ==# s:Dir.Prev && s:state.till
+      elseif a:dir ==# s:Dir.Prev && a:till
         let l:col = l:col + 1
       endif
       execute printf('normal! %s|', l:col)
+
+      let s:state.dir = a:dir
+      let s:state.till = a:till
+      let s:state.char = l:char
+      let s:state.mode = l:mode
+      let s:state.curpos = getcurpos()
       call s:reserve_reset()
     endif
   end
