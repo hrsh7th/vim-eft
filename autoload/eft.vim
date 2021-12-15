@@ -72,7 +72,7 @@ function! s:goto(repeat, dir, till) abort
       elseif a:dir ==# s:Dir.Prev && a:till
         let l:col = l:col + 1
       endif
-      execute printf('normal! v%s|', l:col)
+      execute printf('normal! %s%s|', (s:is_operator(l:mode) ? 'v' : ''), l:col)
 
       let s:state.dir = a:dir
       let s:state.till = a:till
@@ -110,7 +110,7 @@ endfunction
 "
 function! eft#_reset() abort
   if !empty(s:state)
-    if s:state.curpos != getcurpos() && index(['no', 'nov', 'noV', "no\<C-v>"], s:state.mode) == -1
+    if s:state.curpos != getcurpos() && !s:is_operator(s:state.mode)
       let s:state = {}
     endif
   endif
