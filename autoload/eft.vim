@@ -35,11 +35,13 @@ endfunction
 " s:repeatable
 "
 function! s:repeatable(dir, till, repeatable) abort
+  let l:mode = mode(1)
   let l:ok = a:repeatable && !empty(s:state)
   let l:ok = l:ok && get(s:state, 'dir', v:null) == a:dir
   let l:ok = l:ok && get(s:state, 'till', v:null) == a:till
-  let l:ok = l:ok && get(s:state, 'mode', v:null) == mode(1)
+  let l:ok = l:ok && get(s:state, 'mode', v:null) == l:mode
   let l:ok = l:ok && get(s:state, 'curpos', []) == getcurpos()
+  let l:ok = l:ok && !(g:_eft_mapping && s:is_operator(l:mode))
   return l:ok || (!empty(s:state) && !g:_eft_mapping)
 endfunction
 
@@ -57,7 +59,7 @@ function! s:goto(repeat, dir, till) abort
 
   let l:char = get(s:state, 'char', v:null)
   if !a:repeat
-    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, index(['no', 'nov', 'noV', "no\<C-v>"], l:mode) >= 0)
+    let l:Clear_highlight = eft#highlight(l:line, l:indices, v:count1, s:is_operator(l:mode))
     let l:char = s:getchar()
     call l:Clear_highlight()
   endif
@@ -70,7 +72,7 @@ function! s:goto(repeat, dir, till) abort
       elseif a:dir ==# s:Dir.Prev && a:till
         let l:col = l:col + 1
       endif
-      execute printf('normal! %s|', l:col)
+      execute printf('normal! v%s|', l:col)
 
       let s:state.dir = a:dir
       let s:state.till = a:till
@@ -210,3 +212,9 @@ function! s:getchar() abort
   return ''
 endfunction
 
+"
+" is_operator
+"
+function! s:is_operator(mode) abort
+  return index(['no', 'nov', 'noV', "no\<C-v>"], a:mode) >= 0
+endfunction
