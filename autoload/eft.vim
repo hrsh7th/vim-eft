@@ -80,7 +80,11 @@ function! s:goto(repeat, dir, till) abort
       let s:state.mode = l:mode
       let s:state.curpos = getcurpos()
       call s:reserve_reset()
+      return
     endif
+  end
+  if s:is_operator(l:mode)
+    call feedkeys("\<Cmd>normal! u\<CR>", 'n')
   end
 endfunction
 
