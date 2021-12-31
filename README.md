@@ -7,9 +7,12 @@ This plugin provides f/t/F/T mappings that can be customized by your setting.
 You can enable this plugin via following mappings.
 
 ```viml
-  nmap ; <Plug>(eft-repeat)
-  xmap ; <Plug>(eft-repeat)
-  omap ; <Plug>(eft-repeat)
+  nmap ; <Plug>(eft-repeat-next)
+  xmap ; <Plug>(eft-repeat-next)
+  omap ; <Plug>(eft-repeat-next)
+  nmap , <Plug>(eft-repeat-prev)
+  xmap , <Plug>(eft-repeat-prev)
+  omap , <Plug>(eft-repeat-prev)
 
   nmap f <Plug>(eft-f)
   xmap f <Plug>(eft-f)

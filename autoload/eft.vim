@@ -7,11 +7,13 @@ let s:Dir.Prev = 2
 "
 " eft#repeat
 "
-function! eft#repeat() abort
-  if !empty(s:state) && s:repeatable(s:state.dir, s:state.till, v:true)
-    call s:goto(v:true, s:state.dir, s:state.till)
+function! eft#repeat(dir, fallback) abort
+  let l:dir = a:dir == s:state.dir ? s:Dir.Next : s:Dir.Prev
+
+  if !empty(s:state) && s:repeatable(l:dir, s:state.till, v:true)
+    call s:goto(v:true, l:dir, s:state.till)
   else
-    normal! ;
+    execute 'normal! ' . a:fallback
   endif
 endfunction
 

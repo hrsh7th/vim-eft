@@ -52,9 +52,12 @@ function! s:highlight() abort
 endfunction
 call s:highlight()
 
-nnoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
-xnoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
-onoremap <silent> <Plug>(eft-repeat) <Cmd>call eft#repeat()<CR>
+nnoremap <silent> <Plug>(eft-repeat-next) <Cmd>call eft#repeat(1, ';')<CR>
+xnoremap <silent> <Plug>(eft-repeat-next) <Cmd>call eft#repeat(1, ';')<CR>
+onoremap <silent> <Plug>(eft-repeat-next) <Cmd>call eft#repeat(1, ';')<CR>
+nnoremap <silent> <Plug>(eft-repeat-prev) <Cmd>call eft#repeat(2, ',')<CR>
+xnoremap <silent> <Plug>(eft-repeat-prev) <Cmd>call eft#repeat(2, ',')<CR>
+onoremap <silent> <Plug>(eft-repeat-prev) <Cmd>call eft#repeat(2, ',')<CR>
 
 nnoremap <expr><silent> <Plug>(eft-f-repeatable) <SID>map('forward', v:false, v:true)
 nnoremap <expr><silent> <Plug>(eft-t-repeatable) <SID>map('forward', v:true, v:true)
