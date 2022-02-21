@@ -32,6 +32,16 @@ function! eft#backward(args) abort
 endfunction
 
 "
+" eft#clear
+"
+function! eft#clear() abort
+  augroup eft
+    autocmd!
+  augroup END
+  let s:state = {}
+endfunction
+
+"
 " s:repeatable
 "
 function! s:repeatable(dir, till, repeatable) abort
@@ -84,7 +94,7 @@ function! s:goto(repeat, dir, till) abort
     endif
   end
   if s:is_operator(l:mode)
-    call feedkeys("\<Cmd>normal! u\<CR>", 'n')
+    call feedkeys("\<Cmd>normal! u\<CR>", 'in')
   end
 endfunction
 
@@ -95,7 +105,7 @@ function! s:reserve_reset() abort
   augroup eft
     autocmd!
   augroup END
-  call feedkeys("\<Cmd>call eft#_reserve_reset()\<CR>", 'n')
+  call feedkeys("\<Cmd>call eft#_reserve_reset()\<CR>", 'in')
 endfunction
 
 "
@@ -115,7 +125,7 @@ endfunction
 function! eft#_reset() abort
   if !empty(s:state)
     if s:state.curpos != getcurpos() && !s:is_operator(s:state.mode)
-      let s:state = {}
+      call eft#clear()
     endif
   endif
 endfunction
@@ -124,7 +134,7 @@ endfunction
 " eft#highlight
 "
 function! eft#highlight(line, indices, count, is_operator_pending) abort
-  if empty(g:eft_highlight)
+  if empty(g:eft_highlight) || reg_executing() !=# ''
     return { -> {} }
   endif
 
@@ -209,7 +219,6 @@ endfunction
 "
 function! s:getchar() abort
   let l:char = nr2char(getchar())
-  redraw
   if l:char =~# '[[:print:][:blank:]]'
     return l:char
   endif
