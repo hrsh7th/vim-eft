@@ -65,7 +65,8 @@ function! s:goto(repeat, dir, till) abort
   let l:curpos = getcurpos()
   let l:line = getline(l:curpos[1])
   let l:col = l:curpos[2]
-  let l:indices = a:dir ==# s:Dir.Next ? range(l:col, strlen(l:line)) : range(l:col - 2, 0, -1)
+  let l:tilloff = a:till ? 1 : 0
+  let l:indices = a:dir ==# s:Dir.Next ? range(l:col + l:tilloff, strlen(l:line)) : range(l:col - (2 + l:tilloff), 0, -1)
 
   let l:char = get(s:state, 'char', v:null)
   if !a:repeat
