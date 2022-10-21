@@ -35,7 +35,7 @@ endfunction
 " eft#clear
 "
 function! eft#clear() abort
-  augroup eft
+  augroup eft_reset_action_queue
     autocmd!
   augroup END
   let s:state = {}
@@ -103,7 +103,7 @@ endfunction
 " s:reserve_reset
 "
 function! s:reserve_reset() abort
-  augroup eft
+  augroup eft_reset_action_queue
     autocmd!
   augroup END
   call feedkeys("\<Cmd>call eft#_reserve_reset()\<CR>", 'in')
@@ -114,7 +114,7 @@ endfunction
 "
 function! eft#_reserve_reset() abort
   let s:state.curpos = getcurpos()
-  augroup eft
+  augroup eft_reset_action_queue
     autocmd!
     autocmd CursorMoved <buffer> call eft#_reset()
   augroup END
